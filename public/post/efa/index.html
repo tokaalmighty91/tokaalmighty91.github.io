@@ -109,14 +109,18 @@
     <div class="col-lg-8">
       <div class="content-column-content">
          <h1>Exploratory Factor Analysis using R</h1>
-         <div id="preparation" class="section level2">
-<h2>Preparation</h2>
+         <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below.</p>
 <div class="figure"><span id="fig:pressure"></span>
-<img src="EFA.png" alt="CESD Questionnaire" width="100%" />
+<img src="EFA.png" alt="CESD Questionnaire" width="80%" />
 <p class="caption">
 Figure 1: CESD Questionnaire
 </p>
 </div>
+</div>
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
 <div id="install-packages" class="section level3">
 <h3>Install Packages</h3>
 <pre class="r"><code>#install.packages(&quot;Hmisc&quot;)
@@ -150,9 +154,9 @@ data &lt;- data[!myvars]</code></pre>
 </div>
 <div id="dealing-with-missing-data" class="section level3">
 <h3>Dealing with Missing Data</h3>
-<pre class="r"><code>nrow(data)
-## [1] 848
-# We are starting with 848 rows of entries, N = 848 .</code></pre>
+<pre class="r"><code>nrow(data)</code></pre>
+<pre><code>## [1] 848</code></pre>
+<pre class="r"><code># We are starting with 848 rows of entries, N = 848 .</code></pre>
 <pre class="r"><code># View first 6 lines of data
 kable(head(data))</code></pre>
 <table>
@@ -316,8 +320,8 @@ kable(head(data))</code></pre>
 </tbody>
 </table>
 <pre class="r"><code># Get the number of Ss with more than 50% of missing answers
-length(which(rowMeans(is.na(data)) &gt; 0.5))
-## [1] 74</code></pre>
+length(which(rowMeans(is.na(data)) &gt; 0.5))</code></pre>
+<pre><code>## [1] 74</code></pre>
 <pre class="r"><code># remove any row with more than 50% of missing answers
 data&lt;- data[-which(rowMeans(is.na(data)) &gt; 0.5) , ] 
 
@@ -485,8 +489,8 @@ kable(head(data))</code></pre>
 </table>
 <pre class="r"><code># After removing the 74 Ss with more than 50% missing answers
 # We ended with 774 Ss, the analysis will be conducted on N = 774
-nrow(data)
-## [1] 774</code></pre>
+nrow(data)</code></pre>
+<pre><code>## [1] 774</code></pre>
 </div>
 </div>
 <div id="create-correlation-matrices" class="section level2">
@@ -1077,8 +1081,7 @@ parallel &lt;- fa.parallel(data,
                         fm = &#39;ml&#39;, 
                         fa = &#39;both&#39;)</code></pre>
 <p><img src="/post/EFA_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<pre class="r"><code>
-# Parallel analysis suggests that the number of factors =  5  
+<pre class="r"><code># Parallel analysis suggests that the number of factors =  5  
 # and the number of components =  2</code></pre>
 </div>
 <div id="factor-analysis" class="section level3">
@@ -1093,8 +1096,8 @@ onefactor &lt;- fa(data,nfactors = 1,
                  rotate = &quot;oblimin&quot;,
                  fm=&quot;ml&quot;)
 
-onefactor
-## Factor Analysis using method =  ml
+onefactor</code></pre>
+<pre><code>## Factor Analysis using method =  ml
 ## Call: fa(r = data, nfactors = 1, rotate = &quot;oblimin&quot;, fm = &quot;ml&quot;)
 ## Standardized loadings (pattern matrix) based upon correlation matrix
 ##           ML1   h2   u2 com
@@ -1147,8 +1150,8 @@ onefactor
 <p>I used recoded scales for item 4, 8, 12 and 16, therefore no negative loadings were expected. Negative loaded items measures opposite pole of the intended measured construct. The raw score of the item is subtracted rather than added; this is analogous to reverse-coded items.</p>
 <p>The onefactor model seemed to be a good fit seeing that RMSR &lt; .08. However, significant <span class="math inline">\(\chi^2\)</span> test and RMSEA &gt; .06 suggests that the correlation matrix predicted by the factor model parameter estimates differ from the sample correlation matrix. TLI &lt; .95 indicating the model can be improved.</p>
 <pre class="r"><code># Getting % variance explained
-onefactor$loadings
-## 
+onefactor$loadings</code></pre>
+<pre><code>## 
 ## Loadings:
 ##          ML1  
 ## cesdx1   0.559
@@ -1188,8 +1191,8 @@ onefactor$loadings
                  fm=&quot;ml&quot;)
 
 # % variance explained increased from 34% to 40%.
-twofactor
-## Factor Analysis using method =  ml
+twofactor</code></pre>
+<pre><code>## Factor Analysis using method =  ml
 ## Call: fa(r = data, nfactors = 2, rotate = &quot;oblimin&quot;, fm = &quot;ml&quot;)
 ## Standardized loadings (pattern matrix) based upon correlation matrix
 ##            ML1   ML2   h2   u2 com
@@ -1251,8 +1254,8 @@ twofactor
 <pre class="r"><code># Relabel the 2 factors
 colnames(twofactor$loadings)&lt;- c(&#39;Neg_Items&#39;, &#39;Pos_Items&#39;)
 # Set factor loading cutoff to be .3 (pattern matrix)
-print(twofactor$loadings,cutoff=.3)
-## 
+print(twofactor$loadings,cutoff=.3)</code></pre>
+<pre><code>## 
 ## Loadings:
 ##          Neg_Items Pos_Items
 ## cesdx1    0.611             
@@ -1281,8 +1284,8 @@ print(twofactor$loadings,cutoff=.3)
 ## Proportion Var     0.281     0.112
 ## Cumulative Var     0.281     0.393</code></pre>
 <pre class="r"><code># Recapture onefactor loadings (pattern matrix)
-onefactor$loadings
-## 
+onefactor$loadings</code></pre>
+<pre><code>## 
 ## Loadings:
 ##          ML1  
 ## cesdx1   0.559
