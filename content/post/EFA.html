@@ -1,0 +1,1225 @@
+---
+data: 2018-10-01
+title: "Exploratory Factor Analysis using R"
+type: "post"
+author: Toka Zhu
+draft: false
+---
+
+
+
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
+<div id="install-packages" class="section level3">
+<h3>Install Packages</h3>
+<pre class="r"><code>#install.packages(&quot;Hmisc&quot;)
+#install.packages(&#39;corrplot&#39;)
+#install.packages(&#39;psych&#39;)
+#install.packages(&#39;nFactors&#39;)
+#install.packages(&#39;GPArotation&#39;)
+#install.packages(&#39;sem&#39;)</code></pre>
+</div>
+<div id="load-libraries" class="section level3">
+<h3>Load libraries</h3>
+<pre class="r"><code>library(knitr)
+library(Hmisc)
+library(corrplot)
+library(psych)
+library(GPArotation)
+library(rmarkdown)
+library(sem)</code></pre>
+</div>
+</div>
+<div id="data-manipulation" class="section level2">
+<h2>Data Manipulation</h2>
+<div id="subsetting" class="section level3">
+<h3>Subsetting</h3>
+<pre class="r"><code>data&lt;-read.csv(&#39;CESD.csv&#39;)
+
+# exclude variables cesdx4,cesdx8,cesdx12, cesdx16
+myvars &lt;- names(data) %in% 
+          c(&quot;cesdx4&quot;, &quot;cesdx8&quot;, &quot;cesdx12&quot;, &quot;cesdx16&quot;,&quot;gender&quot;) 
+data &lt;- data[!myvars]</code></pre>
+</div>
+<div id="dealing-with-missing-data" class="section level3">
+<h3>Dealing with Missing Data</h3>
+<pre class="r"><code>nrow(data)</code></pre>
+<pre><code>## [1] 848</code></pre>
+<pre class="r"><code># We are starting with 848 rows of entries, N = 848 .</code></pre>
+<pre class="r"><code># View first 6 lines of data
+kable(head(data))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">cesdx1</th>
+<th align="right">cesdx2</th>
+<th align="right">cesdx3</th>
+<th align="right">cesdx5</th>
+<th align="right">cesdx6</th>
+<th align="right">cesdx7</th>
+<th align="right">cesdx9</th>
+<th align="right">cesdx10</th>
+<th align="right">cesdx11</th>
+<th align="right">cesdx13</th>
+<th align="right">cesdx14</th>
+<th align="right">cesdx15</th>
+<th align="right">cesdx17</th>
+<th align="right">cesdx18</th>
+<th align="right">cesdx19</th>
+<th align="right">cesdx20</th>
+<th align="right">cesdx4r</th>
+<th align="right">cesdx8r</th>
+<th align="right">cesdx12r</th>
+<th align="right">cesdx16r</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Get the number of Ss with more than 50% of missing answers
+length(which(rowMeans(is.na(data)) &gt; 0.5))</code></pre>
+<pre><code>## [1] 74</code></pre>
+<pre class="r"><code># remove any row with more than 50% of missing answers
+data&lt;- data[-which(rowMeans(is.na(data)) &gt; 0.5) , ] 
+
+# view first 6 rows of cleaned data
+kable(head(data))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="right">cesdx1</th>
+<th align="right">cesdx2</th>
+<th align="right">cesdx3</th>
+<th align="right">cesdx5</th>
+<th align="right">cesdx6</th>
+<th align="right">cesdx7</th>
+<th align="right">cesdx9</th>
+<th align="right">cesdx10</th>
+<th align="right">cesdx11</th>
+<th align="right">cesdx13</th>
+<th align="right">cesdx14</th>
+<th align="right">cesdx15</th>
+<th align="right">cesdx17</th>
+<th align="right">cesdx18</th>
+<th align="right">cesdx19</th>
+<th align="right">cesdx20</th>
+<th align="right">cesdx4r</th>
+<th align="right">cesdx8r</th>
+<th align="right">cesdx12r</th>
+<th align="right">cesdx16r</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">NA</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">0</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">3</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">3</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">2</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="right">1</td>
+<td align="right">1</td>
+<td align="right">2</td>
+<td align="right">2</td>
+<td align="right">2</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># After removing the 74 Ss with more than 50% missing answers
+# We ended with 774 Ss, the analysis will be conducted on N = 774
+nrow(data)</code></pre>
+<pre><code>## [1] 774</code></pre>
+</div>
+</div>
+<div id="create-correlation-matrices" class="section level2">
+<h2>Create Correlation Matrices</h2>
+<div id="cor_matrix1-using-pairwise-deletion" class="section level3">
+<h3>cor_matrix1, using pairwise-deletion</h3>
+<pre class="r"><code># Since the remaining Ss have answers to at least 50% of the 20 items.
+# I used pair-wise deletion to create the correlation matrix,
+# all 774 remaining Ss are preserved. 
+
+cor_matrix1&lt;- cor(data, method = &quot;pearson&quot;, 
+                  use = &quot;pairwise.complete.obs&quot;)
+kable(round(cor_matrix1, 2))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">cesdx1</th>
+<th align="right">cesdx2</th>
+<th align="right">cesdx3</th>
+<th align="right">cesdx5</th>
+<th align="right">cesdx6</th>
+<th align="right">cesdx7</th>
+<th align="right">cesdx9</th>
+<th align="right">cesdx10</th>
+<th align="right">cesdx11</th>
+<th align="right">cesdx13</th>
+<th align="right">cesdx14</th>
+<th align="right">cesdx15</th>
+<th align="right">cesdx17</th>
+<th align="right">cesdx18</th>
+<th align="right">cesdx19</th>
+<th align="right">cesdx20</th>
+<th align="right">cesdx4r</th>
+<th align="right">cesdx8r</th>
+<th align="right">cesdx12r</th>
+<th align="right">cesdx16r</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>cesdx1</td>
+<td align="right">1.00</td>
+<td align="right">0.31</td>
+<td align="right">0.48</td>
+<td align="right">0.25</td>
+<td align="right">0.47</td>
+<td align="right">0.25</td>
+<td align="right">0.26</td>
+<td align="right">0.34</td>
+<td align="right">0.29</td>
+<td align="right">0.31</td>
+<td align="right">0.39</td>
+<td align="right">0.23</td>
+<td align="right">0.39</td>
+<td align="right">0.47</td>
+<td align="right">0.32</td>
+<td align="right">0.32</td>
+<td align="right">0.18</td>
+<td align="right">0.11</td>
+<td align="right">0.30</td>
+<td align="right">0.32</td>
+</tr>
+<tr class="even">
+<td>cesdx2</td>
+<td align="right">0.31</td>
+<td align="right">1.00</td>
+<td align="right">0.37</td>
+<td align="right">0.23</td>
+<td align="right">0.33</td>
+<td align="right">0.21</td>
+<td align="right">0.17</td>
+<td align="right">0.22</td>
+<td align="right">0.28</td>
+<td align="right">0.20</td>
+<td align="right">0.33</td>
+<td align="right">0.17</td>
+<td align="right">0.31</td>
+<td align="right">0.31</td>
+<td align="right">0.22</td>
+<td align="right">0.30</td>
+<td align="right">0.15</td>
+<td align="right">0.10</td>
+<td align="right">0.21</td>
+<td align="right">0.20</td>
+</tr>
+<tr class="odd">
+<td>cesdx3</td>
+<td align="right">0.48</td>
+<td align="right">0.37</td>
+<td align="right">1.00</td>
+<td align="right">0.34</td>
+<td align="right">0.69</td>
+<td align="right">0.34</td>
+<td align="right">0.43</td>
+<td align="right">0.36</td>
+<td align="right">0.33</td>
+<td align="right">0.33</td>
+<td align="right">0.55</td>
+<td align="right">0.33</td>
+<td align="right">0.44</td>
+<td align="right">0.60</td>
+<td align="right">0.45</td>
+<td align="right">0.41</td>
+<td align="right">0.28</td>
+<td align="right">0.23</td>
+<td align="right">0.42</td>
+<td align="right">0.45</td>
+</tr>
+<tr class="even">
+<td>cesdx5</td>
+<td align="right">0.25</td>
+<td align="right">0.23</td>
+<td align="right">0.34</td>
+<td align="right">1.00</td>
+<td align="right">0.35</td>
+<td align="right">0.25</td>
+<td align="right">0.23</td>
+<td align="right">0.29</td>
+<td align="right">0.21</td>
+<td align="right">0.16</td>
+<td align="right">0.31</td>
+<td align="right">0.15</td>
+<td align="right">0.15</td>
+<td align="right">0.30</td>
+<td align="right">0.23</td>
+<td align="right">0.40</td>
+<td align="right">0.03</td>
+<td align="right">0.10</td>
+<td align="right">0.16</td>
+<td align="right">0.19</td>
+</tr>
+<tr class="odd">
+<td>cesdx6</td>
+<td align="right">0.47</td>
+<td align="right">0.33</td>
+<td align="right">0.69</td>
+<td align="right">0.35</td>
+<td align="right">1.00</td>
+<td align="right">0.36</td>
+<td align="right">0.46</td>
+<td align="right">0.45</td>
+<td align="right">0.33</td>
+<td align="right">0.34</td>
+<td align="right">0.60</td>
+<td align="right">0.38</td>
+<td align="right">0.47</td>
+<td align="right">0.70</td>
+<td align="right">0.51</td>
+<td align="right">0.46</td>
+<td align="right">0.30</td>
+<td align="right">0.25</td>
+<td align="right">0.50</td>
+<td align="right">0.53</td>
+</tr>
+<tr class="even">
+<td>cesdx7</td>
+<td align="right">0.25</td>
+<td align="right">0.21</td>
+<td align="right">0.34</td>
+<td align="right">0.25</td>
+<td align="right">0.36</td>
+<td align="right">1.00</td>
+<td align="right">0.29</td>
+<td align="right">0.31</td>
+<td align="right">0.24</td>
+<td align="right">0.28</td>
+<td align="right">0.31</td>
+<td align="right">0.23</td>
+<td align="right">0.20</td>
+<td align="right">0.26</td>
+<td align="right">0.28</td>
+<td align="right">0.36</td>
+<td align="right">0.05</td>
+<td align="right">0.04</td>
+<td align="right">0.25</td>
+<td align="right">0.26</td>
+</tr>
+<tr class="odd">
+<td>cesdx9</td>
+<td align="right">0.26</td>
+<td align="right">0.17</td>
+<td align="right">0.43</td>
+<td align="right">0.23</td>
+<td align="right">0.46</td>
+<td align="right">0.29</td>
+<td align="right">1.00</td>
+<td align="right">0.44</td>
+<td align="right">0.21</td>
+<td align="right">0.23</td>
+<td align="right">0.37</td>
+<td align="right">0.36</td>
+<td align="right">0.24</td>
+<td align="right">0.40</td>
+<td align="right">0.47</td>
+<td align="right">0.37</td>
+<td align="right">0.28</td>
+<td align="right">0.29</td>
+<td align="right">0.41</td>
+<td align="right">0.45</td>
+</tr>
+<tr class="even">
+<td>cesdx10</td>
+<td align="right">0.34</td>
+<td align="right">0.22</td>
+<td align="right">0.36</td>
+<td align="right">0.29</td>
+<td align="right">0.45</td>
+<td align="right">0.31</td>
+<td align="right">0.44</td>
+<td align="right">1.00</td>
+<td align="right">0.22</td>
+<td align="right">0.25</td>
+<td align="right">0.45</td>
+<td align="right">0.33</td>
+<td align="right">0.32</td>
+<td align="right">0.44</td>
+<td align="right">0.46</td>
+<td align="right">0.34</td>
+<td align="right">0.18</td>
+<td align="right">0.18</td>
+<td align="right">0.34</td>
+<td align="right">0.36</td>
+</tr>
+<tr class="odd">
+<td>cesdx11</td>
+<td align="right">0.29</td>
+<td align="right">0.28</td>
+<td align="right">0.33</td>
+<td align="right">0.21</td>
+<td align="right">0.33</td>
+<td align="right">0.24</td>
+<td align="right">0.21</td>
+<td align="right">0.22</td>
+<td align="right">1.00</td>
+<td align="right">0.24</td>
+<td align="right">0.33</td>
+<td align="right">0.22</td>
+<td align="right">0.30</td>
+<td align="right">0.30</td>
+<td align="right">0.32</td>
+<td align="right">0.30</td>
+<td align="right">0.08</td>
+<td align="right">0.06</td>
+<td align="right">0.22</td>
+<td align="right">0.24</td>
+</tr>
+<tr class="even">
+<td>cesdx13</td>
+<td align="right">0.31</td>
+<td align="right">0.20</td>
+<td align="right">0.33</td>
+<td align="right">0.16</td>
+<td align="right">0.34</td>
+<td align="right">0.28</td>
+<td align="right">0.23</td>
+<td align="right">0.25</td>
+<td align="right">0.24</td>
+<td align="right">1.00</td>
+<td align="right">0.44</td>
+<td align="right">0.34</td>
+<td align="right">0.24</td>
+<td align="right">0.32</td>
+<td align="right">0.33</td>
+<td align="right">0.28</td>
+<td align="right">0.19</td>
+<td align="right">0.10</td>
+<td align="right">0.26</td>
+<td align="right">0.27</td>
+</tr>
+<tr class="odd">
+<td>cesdx14</td>
+<td align="right">0.39</td>
+<td align="right">0.33</td>
+<td align="right">0.55</td>
+<td align="right">0.31</td>
+<td align="right">0.60</td>
+<td align="right">0.31</td>
+<td align="right">0.37</td>
+<td align="right">0.45</td>
+<td align="right">0.33</td>
+<td align="right">0.44</td>
+<td align="right">1.00</td>
+<td align="right">0.41</td>
+<td align="right">0.43</td>
+<td align="right">0.62</td>
+<td align="right">0.49</td>
+<td align="right">0.40</td>
+<td align="right">0.25</td>
+<td align="right">0.21</td>
+<td align="right">0.44</td>
+<td align="right">0.46</td>
+</tr>
+<tr class="even">
+<td>cesdx15</td>
+<td align="right">0.23</td>
+<td align="right">0.17</td>
+<td align="right">0.33</td>
+<td align="right">0.15</td>
+<td align="right">0.38</td>
+<td align="right">0.23</td>
+<td align="right">0.36</td>
+<td align="right">0.33</td>
+<td align="right">0.22</td>
+<td align="right">0.34</td>
+<td align="right">0.41</td>
+<td align="right">1.00</td>
+<td align="right">0.20</td>
+<td align="right">0.33</td>
+<td align="right">0.57</td>
+<td align="right">0.34</td>
+<td align="right">0.20</td>
+<td align="right">0.14</td>
+<td align="right">0.33</td>
+<td align="right">0.35</td>
+</tr>
+<tr class="odd">
+<td>cesdx17</td>
+<td align="right">0.39</td>
+<td align="right">0.31</td>
+<td align="right">0.44</td>
+<td align="right">0.15</td>
+<td align="right">0.47</td>
+<td align="right">0.20</td>
+<td align="right">0.24</td>
+<td align="right">0.32</td>
+<td align="right">0.30</td>
+<td align="right">0.24</td>
+<td align="right">0.43</td>
+<td align="right">0.20</td>
+<td align="right">1.00</td>
+<td align="right">0.60</td>
+<td align="right">0.33</td>
+<td align="right">0.27</td>
+<td align="right">0.21</td>
+<td align="right">0.14</td>
+<td align="right">0.32</td>
+<td align="right">0.30</td>
+</tr>
+<tr class="even">
+<td>cesdx18</td>
+<td align="right">0.47</td>
+<td align="right">0.31</td>
+<td align="right">0.60</td>
+<td align="right">0.30</td>
+<td align="right">0.70</td>
+<td align="right">0.26</td>
+<td align="right">0.40</td>
+<td align="right">0.44</td>
+<td align="right">0.30</td>
+<td align="right">0.32</td>
+<td align="right">0.62</td>
+<td align="right">0.33</td>
+<td align="right">0.60</td>
+<td align="right">1.00</td>
+<td align="right">0.50</td>
+<td align="right">0.43</td>
+<td align="right">0.26</td>
+<td align="right">0.21</td>
+<td align="right">0.42</td>
+<td align="right">0.44</td>
+</tr>
+<tr class="odd">
+<td>cesdx19</td>
+<td align="right">0.32</td>
+<td align="right">0.22</td>
+<td align="right">0.45</td>
+<td align="right">0.23</td>
+<td align="right">0.51</td>
+<td align="right">0.28</td>
+<td align="right">0.47</td>
+<td align="right">0.46</td>
+<td align="right">0.32</td>
+<td align="right">0.33</td>
+<td align="right">0.49</td>
+<td align="right">0.57</td>
+<td align="right">0.33</td>
+<td align="right">0.50</td>
+<td align="right">1.00</td>
+<td align="right">0.47</td>
+<td align="right">0.32</td>
+<td align="right">0.20</td>
+<td align="right">0.38</td>
+<td align="right">0.43</td>
+</tr>
+<tr class="even">
+<td>cesdx20</td>
+<td align="right">0.32</td>
+<td align="right">0.30</td>
+<td align="right">0.41</td>
+<td align="right">0.40</td>
+<td align="right">0.46</td>
+<td align="right">0.36</td>
+<td align="right">0.37</td>
+<td align="right">0.34</td>
+<td align="right">0.30</td>
+<td align="right">0.28</td>
+<td align="right">0.40</td>
+<td align="right">0.34</td>
+<td align="right">0.27</td>
+<td align="right">0.43</td>
+<td align="right">0.47</td>
+<td align="right">1.00</td>
+<td align="right">0.15</td>
+<td align="right">0.17</td>
+<td align="right">0.33</td>
+<td align="right">0.35</td>
+</tr>
+<tr class="odd">
+<td>cesdx4r</td>
+<td align="right">0.18</td>
+<td align="right">0.15</td>
+<td align="right">0.28</td>
+<td align="right">0.03</td>
+<td align="right">0.30</td>
+<td align="right">0.05</td>
+<td align="right">0.28</td>
+<td align="right">0.18</td>
+<td align="right">0.08</td>
+<td align="right">0.19</td>
+<td align="right">0.25</td>
+<td align="right">0.20</td>
+<td align="right">0.21</td>
+<td align="right">0.26</td>
+<td align="right">0.32</td>
+<td align="right">0.15</td>
+<td align="right">1.00</td>
+<td align="right">0.46</td>
+<td align="right">0.41</td>
+<td align="right">0.43</td>
+</tr>
+<tr class="even">
+<td>cesdx8r</td>
+<td align="right">0.11</td>
+<td align="right">0.10</td>
+<td align="right">0.23</td>
+<td align="right">0.10</td>
+<td align="right">0.25</td>
+<td align="right">0.04</td>
+<td align="right">0.29</td>
+<td align="right">0.18</td>
+<td align="right">0.06</td>
+<td align="right">0.10</td>
+<td align="right">0.21</td>
+<td align="right">0.14</td>
+<td align="right">0.14</td>
+<td align="right">0.21</td>
+<td align="right">0.20</td>
+<td align="right">0.17</td>
+<td align="right">0.46</td>
+<td align="right">1.00</td>
+<td align="right">0.45</td>
+<td align="right">0.47</td>
+</tr>
+<tr class="odd">
+<td>cesdx12r</td>
+<td align="right">0.30</td>
+<td align="right">0.21</td>
+<td align="right">0.42</td>
+<td align="right">0.16</td>
+<td align="right">0.50</td>
+<td align="right">0.25</td>
+<td align="right">0.41</td>
+<td align="right">0.34</td>
+<td align="right">0.22</td>
+<td align="right">0.26</td>
+<td align="right">0.44</td>
+<td align="right">0.33</td>
+<td align="right">0.32</td>
+<td align="right">0.42</td>
+<td align="right">0.38</td>
+<td align="right">0.33</td>
+<td align="right">0.41</td>
+<td align="right">0.45</td>
+<td align="right">1.00</td>
+<td align="right">0.80</td>
+</tr>
+<tr class="even">
+<td>cesdx16r</td>
+<td align="right">0.32</td>
+<td align="right">0.20</td>
+<td align="right">0.45</td>
+<td align="right">0.19</td>
+<td align="right">0.53</td>
+<td align="right">0.26</td>
+<td align="right">0.45</td>
+<td align="right">0.36</td>
+<td align="right">0.24</td>
+<td align="right">0.27</td>
+<td align="right">0.46</td>
+<td align="right">0.35</td>
+<td align="right">0.30</td>
+<td align="right">0.44</td>
+<td align="right">0.43</td>
+<td align="right">0.35</td>
+<td align="right">0.43</td>
+<td align="right">0.47</td>
+<td align="right">0.80</td>
+<td align="right">1.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="cor_matrix2-with-significance-levels" class="section level3">
+<h3>cor_matrix2, with significance levels</h3>
+<pre class="r"><code># rcorr() from Hmisc package is used to compute significance levels for
+# pearson and spearman correlations. It returns both the correlation and
+# the p-value of all possible pairs of columns in the data
+cor_matrix2&lt;- rcorr(as.matrix(data))</code></pre>
+<div id="prettify-cor_matrix2-notes-for-self" class="section level4">
+<h4>Prettify cor_matrix2 (notes for self)</h4>
+<pre class="r"><code># A function to format the correlation matrix
+flattenCorMatrix2 &lt;- function(cormat, pmat) {
+  ut &lt;- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+# Create a pretty looking correlation matrix
+pretty_cormatrix2&lt;-flattenCorMatrix2(cor_matrix2$r, cor_matrix2$P)
+
+# All p&#39;s are highly significant (roughly 0)
+# So I only display the first 6 row of pretty_cormatrix2
+kable(head(pretty_cormatrix2))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">row</th>
+<th align="left">column</th>
+<th align="right">cor</th>
+<th align="right">p</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">cesdx1</td>
+<td align="left">cesdx2</td>
+<td align="right">0.3072553</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">cesdx1</td>
+<td align="left">cesdx3</td>
+<td align="right">0.4816257</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">cesdx2</td>
+<td align="left">cesdx3</td>
+<td align="right">0.3690996</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">cesdx1</td>
+<td align="left">cesdx5</td>
+<td align="right">0.2486510</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">cesdx2</td>
+<td align="left">cesdx5</td>
+<td align="right">0.2315795</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">cesdx3</td>
+<td align="left">cesdx5</td>
+<td align="right">0.3408738</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="factor-extraction-and-selection--using-psych-package" class="section level2">
+<h2>Factor Extraction and Selection- Using psych package</h2>
+<div id="parallel-analysis-scree-plots" class="section level3">
+<h3>Parallel Analysis Scree Plots</h3>
+<pre class="r"><code># Determine Number of Factors to Extract
+# The factor should account for more variance than is 
+# expected by chance.
+parallel &lt;- fa.parallel(data, 
+                        fm = &#39;ml&#39;, 
+                        fa = &#39;both&#39;)</code></pre>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code># Parallel analysis suggests that the number of factors =  5  
+# and the number of components =  2</code></pre>
+</div>
+<div id="factor-analysis" class="section level3">
+<h3>Factor Analysis</h3>
+<div id="one-factor-solution" class="section level4">
+<h4>One factor solution</h4>
+<pre class="r"><code># Use fa() function from &#39;psych&#39; package. 
+# &#39;oblimin&#39; is oblique rotation assuming factor dependency
+# Rotation does not change the one-factor solution
+# fm - using &#39;Maximum Likelihood&#39; factor extraction
+onefactor &lt;- fa(data,nfactors = 1,
+                 rotate = &quot;oblimin&quot;,
+                 fm=&quot;ml&quot;)
+
+onefactor</code></pre>
+<pre><code>## Factor Analysis using method =  ml
+## Call: fa(r = data, nfactors = 1, rotate = &quot;oblimin&quot;, fm = &quot;ml&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##           ML1   h2   u2 com
+## cesdx1   0.56 0.31 0.69   1
+## cesdx2   0.42 0.17 0.83   1
+## cesdx3   0.75 0.56 0.44   1
+## cesdx5   0.40 0.16 0.84   1
+## cesdx6   0.82 0.68 0.32   1
+## cesdx7   0.43 0.19 0.81   1
+## cesdx9   0.58 0.34 0.66   1
+## cesdx10  0.58 0.33 0.67   1
+## cesdx11  0.42 0.18 0.82   1
+## cesdx13  0.46 0.21 0.79   1
+## cesdx14  0.74 0.55 0.45   1
+## cesdx15  0.51 0.26 0.74   1
+## cesdx17  0.57 0.32 0.68   1
+## cesdx18  0.77 0.60 0.40   1
+## cesdx19  0.67 0.45 0.55   1
+## cesdx20  0.58 0.34 0.66   1
+## cesdx4r  0.40 0.16 0.84   1
+## cesdx8r  0.35 0.12 0.88   1
+## cesdx12r 0.64 0.40 0.60   1
+## cesdx16r 0.67 0.45 0.55   1
+## 
+##                 ML1
+## SS loadings    6.77
+## Proportion Var 0.34
+## 
+## Mean item complexity =  1
+## Test of the hypothesis that 1 factor is sufficient.
+## 
+## The degrees of freedom for the null model are  190  and the objective function was  8.31 with Chi Square of  6358.92
+## The degrees of freedom for the model are 170  and the objective function was  1.96 
+## 
+## The root mean square of the residuals (RMSR) is  0.07 
+## The df corrected root mean square of the residuals is  0.08 
+## 
+## The harmonic number of observations is  768 with the empirical chi square  1505.13  with prob &lt;  2.1e-212 
+## The total number of observations was  774  with Likelihood Chi Square =  1497.08  with prob &lt;  7.5e-211 
+## 
+## Tucker Lewis Index of factoring reliability =  0.759
+## RMSEA index =  0.101  and the 90 % confidence intervals are  0.096 0.105
+## BIC =  366.32
+## Fit based upon off diagonal values = 0.96
+## Measures of factor score adequacy             
+##                                                    ML1
+## Correlation of (regression) scores with factors   0.96
+## Multiple R square of scores with factors          0.93
+## Minimum correlation of possible factor scores     0.85</code></pre>
+<p>I used recoded scales for item 4, 8, 12 and 16, therefore no negative loadings were expected. Negative loaded items measures opposite pole of the intended measured construct. The raw score of the item is subtracted rather than added; this is analogous to reverse-coded items.</p>
+<p>The onefactor model seemed to be a good fit seeing that RMSR &lt; .08. However, significant <span class="math inline">\(\chi^2\)</span> test and RMSEA &gt; .06 suggests that the correlation matrix predicted by the factor model parameter estimates differ from the sample correlation matrix. TLI &lt; .95 indicating the model can be improved.</p>
+<pre class="r"><code># Getting % variance explained
+onefactor$loadings</code></pre>
+<pre><code>## 
+## Loadings:
+##          ML1  
+## cesdx1   0.559
+## cesdx2   0.416
+## cesdx3   0.748
+## cesdx5   0.400
+## cesdx6   0.824
+## cesdx7   0.433
+## cesdx9   0.584
+## cesdx10  0.576
+## cesdx11  0.424
+## cesdx13  0.461
+## cesdx14  0.739
+## cesdx15  0.514
+## cesdx17  0.565
+## cesdx18  0.774
+## cesdx19  0.667
+## cesdx20  0.580
+## cesdx4r  0.396
+## cesdx8r  0.347
+## cesdx12r 0.636
+## cesdx16r 0.667
+## 
+##                  ML1
+## SS loadings    6.773
+## Proportion Var 0.339</code></pre>
+<pre class="r"><code>fa.diagram(onefactor)</code></pre>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>As we can clearly see through the ordered factor loading graph, all items had salient loadings ( &gt;=.30) on this individual factor. 12 items’ loadings are practically high ( &gt;.55), but in total only 34% of variance was explained by this factor.</p>
+<p><span class="math display">\[\dfrac{Sum \:of \:squares\: of \:factor \:loadings}{Total \:Var}= \dfrac{6.773}{20}\]</span></p>
+<p>Sum of squares of factor loadings (i.e., eigenvalue). <br> When in practice, CES-D items are often taken together and analyzed as one general factor, however, upon exploratory factor analysis, this model should be improved.</p>
+</div>
+<div id="two-factor-solution" class="section level4">
+<h4>Two factor solution</h4>
+<pre class="r"><code>twofactor &lt;- fa(data,nfactors = 2,
+                 rotate = &quot;oblimin&quot;,
+                 fm=&quot;ml&quot;)
+
+# % variance explained increased from 34% to 40%.
+twofactor</code></pre>
+<pre><code>## Factor Analysis using method =  ml
+## Call: fa(r = data, nfactors = 2, rotate = &quot;oblimin&quot;, fm = &quot;ml&quot;)
+## Standardized loadings (pattern matrix) based upon correlation matrix
+##            ML1   ML2   h2   u2 com
+## cesdx1    0.61 -0.05 0.34 0.66 1.0
+## cesdx2    0.49 -0.09 0.19 0.81 1.1
+## cesdx3    0.75  0.01 0.58 0.42 1.0
+## cesdx5    0.50 -0.13 0.19 0.81 1.1
+## cesdx6    0.77  0.08 0.69 0.31 1.0
+## cesdx7    0.46 -0.02 0.20 0.80 1.0
+## cesdx9    0.40  0.24 0.34 0.66 1.7
+## cesdx10   0.54  0.05 0.33 0.67 1.0
+## cesdx11   0.48 -0.07 0.20 0.80 1.0
+## cesdx13   0.46  0.00 0.22 0.78 1.0
+## cesdx14   0.72  0.04 0.55 0.45 1.0
+## cesdx15   0.43  0.11 0.26 0.74 1.1
+## cesdx17   0.63 -0.07 0.35 0.65 1.0
+## cesdx18   0.82 -0.04 0.63 0.37 1.0
+## cesdx19   0.59  0.10 0.43 0.57 1.1
+## cesdx20   0.58  0.01 0.34 0.66 1.0
+## cesdx4r   0.03  0.49 0.25 0.75 1.0
+## cesdx8r  -0.12  0.62 0.30 0.70 1.1
+## cesdx12r  0.03  0.85 0.75 0.25 1.0
+## cesdx16r  0.04  0.88 0.82 0.18 1.0
+## 
+##                        ML1  ML2
+## SS loadings           5.66 2.30
+## Proportion Var        0.28 0.11
+## Cumulative Var        0.28 0.40
+## Proportion Explained  0.71 0.29
+## Cumulative Proportion 0.71 1.00
+## 
+##  With factor correlations of 
+##      ML1  ML2
+## ML1 1.00 0.62
+## ML2 0.62 1.00
+## 
+## Mean item complexity =  1.1
+## Test of the hypothesis that 2 factors are sufficient.
+## 
+## The degrees of freedom for the null model are  190  and the objective function was  8.31 with Chi Square of  6358.92
+## The degrees of freedom for the model are 151  and the objective function was  1.01 
+## 
+## The root mean square of the residuals (RMSR) is  0.05 
+## The df corrected root mean square of the residuals is  0.05 
+## 
+## The harmonic number of observations is  768 with the empirical chi square  663.81  with prob &lt;  2.1e-65 
+## The total number of observations was  774  with Likelihood Chi Square =  768.89  with prob &lt;  1.8e-83 
+## 
+## Tucker Lewis Index of factoring reliability =  0.874
+## RMSEA index =  0.073  and the 90 % confidence intervals are  0.068 0.078
+## BIC =  -235.5
+## Fit based upon off diagonal values = 0.98
+## Measures of factor score adequacy             
+##                                                    ML1  ML2
+## Correlation of (regression) scores with factors   0.96 0.95
+## Multiple R square of scores with factors          0.92 0.90
+## Minimum correlation of possible factor scores     0.84 0.80</code></pre>
+<p>Item 4,8,12,16 loaded heavily on Factor2, and the rest of the item loaded heavily on Factor1. Each item only loaded high on one factor. It is curious to see that one latent variable can be extracted from the 4 reverse-coded items and only the reverse-coded items. It makes me wonder if Ss are affected by the positive tone in these items thus an artificial latent variable was extracted. In other words, I think if these items were not reverse-coded (i.e., instead of ‘I was happy’ to ‘I was unhappy’), the one factor model would suffice. Looking at the items loaded high on each factor, I would lable the factors ‘Negative Items’ and ‘Positive Items’.</p>
+<pre class="r"><code># Relabel the 2 factors
+colnames(twofactor$loadings)&lt;- c(&#39;Neg_Items&#39;, &#39;Pos_Items&#39;)
+# Set factor loading cutoff to be .3 (pattern matrix)
+print(twofactor$loadings,cutoff=.3)</code></pre>
+<pre><code>## 
+## Loadings:
+##          Neg_Items Pos_Items
+## cesdx1    0.611             
+## cesdx2    0.491             
+## cesdx3    0.753             
+## cesdx5    0.503             
+## cesdx6    0.775             
+## cesdx7    0.456             
+## cesdx9    0.399             
+## cesdx10   0.538             
+## cesdx11   0.483             
+## cesdx13   0.463             
+## cesdx14   0.720             
+## cesdx15   0.426             
+## cesdx17   0.629             
+## cesdx18   0.819             
+## cesdx19   0.594             
+## cesdx20   0.578             
+## cesdx4r             0.486   
+## cesdx8r             0.617   
+## cesdx12r            0.850   
+## cesdx16r            0.880   
+## 
+##                Neg_Items Pos_Items
+## SS loadings        5.611     2.245
+## Proportion Var     0.281     0.112
+## Cumulative Var     0.281     0.393</code></pre>
+<pre class="r"><code># Recapture onefactor loadings (pattern matrix)
+onefactor$loadings</code></pre>
+<pre><code>## 
+## Loadings:
+##          ML1  
+## cesdx1   0.559
+## cesdx2   0.416
+## cesdx3   0.748
+## cesdx5   0.400
+## cesdx6   0.824
+## cesdx7   0.433
+## cesdx9   0.584
+## cesdx10  0.576
+## cesdx11  0.424
+## cesdx13  0.461
+## cesdx14  0.739
+## cesdx15  0.514
+## cesdx17  0.565
+## cesdx18  0.774
+## cesdx19  0.667
+## cesdx20  0.580
+## cesdx4r  0.396
+## cesdx8r  0.347
+## cesdx12r 0.636
+## cesdx16r 0.667
+## 
+##                  ML1
+## SS loadings    6.773
+## Proportion Var 0.339</code></pre>
+<pre class="r"><code>fa.diagram(twofactor)</code></pre>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+</div>
+<div id="visualization-of-correlation-matrix" class="section level4">
+<h4>Visualization of Correlation Matrix</h4>
+<pre class="r"><code># A direct way to see correlations among indicators
+# Insignificant correlations are left blank
+# Positive correlations are blue; negative correlations are red
+corrplot(cor_matrix2$r, 
+         type=&quot;upper&quot;, 
+         order=&quot;hclust&quot;, 
+         p.mat = cor_matrix2$P, 
+         tl.col = &quot;black&quot;, 
+         sig.level = 0.05, 
+         insig = &quot;blank&quot;)</code></pre>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p>Compare to the onefactor model, the fit indices showed that the twofactor model has smaller RMSR, larger TLI, and smaller RMSEA. These indicate better fit than the onefactor model, but still not the optimal model. We also see that the correlation between the 2 factors is .62, which implies a moderate discriminant validity. There may or may not be a common underlying concept behind these 2 factors.</p>
+<p>Conceptually, the whole point of factor analysis is dimension reduction and create a parsimocious model. The onefactor model does not help to achieve this goal. Although the twofactor model is not optimal, but it provides better fit indices to explain observed data, larger proportion of variance can be explained by the two extracted latent variables than onefactor model.</p>
+<p>The twofactor model after oblique rotation creates a factor correlation matrix assuming intercorrelation between the factors. The structure matrix is calculated by multiplying the pattern matrix by the factor correlation matrix. Loadings in the structure matrix reflect both the unique relationship between the indicator and factor and the relationship between the indicator and the shared variance among the factors.</p>
+</div>
+</div>
+</div>
