@@ -1,8 +1,9 @@
 ---
 data: 2018-10-01
 title: "Exploratory Factor Analysis using R"
-type: "post"
 author: Toka Zhu
+categories: ["R"]
+tags: ["R Markdown", "plot", "EFA"]
 draft: false
 ---
 
