@@ -10,6 +10,12 @@ draft: false
 
 <div id="preparation" class="section level2">
 <h2>Preparation</h2>
+<div class="figure"><span id="fig:pressure"></span>
+<img src="EFA.png" alt="CESD Questionnaire" width="100%" />
+<p class="caption">
+Figure 1: CESD Questionnaire
+</p>
+</div>
 <div id="install-packages" class="section level3">
 <h3>Install Packages</h3>
 <pre class="r"><code>#install.packages(&quot;Hmisc&quot;)
@@ -969,7 +975,7 @@ kable(head(pretty_cormatrix2))</code></pre>
 parallel &lt;- fa.parallel(data, 
                         fm = &#39;ml&#39;, 
                         fa = &#39;both&#39;)</code></pre>
-<p><img src="/post/EFA_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
 <pre class="r"><code>
 # Parallel analysis suggests that the number of factors =  5  
 # and the number of components =  2</code></pre>
@@ -1069,7 +1075,7 @@ onefactor$loadings
 ## SS loadings    6.773
 ## Proportion Var 0.339</code></pre>
 <pre class="r"><code>fa.diagram(onefactor)</code></pre>
-<p><img src="/post/EFA_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p>As we can clearly see through the ordered factor loading graph, all items had salient loadings ( &gt;=.30) on this individual factor. 12 items’ loadings are practically high ( &gt;.55), but in total only 34% of variance was explained by this factor.</p>
 <p><span class="math display">\[\dfrac{Sum \:of \:squares\: of \:factor \:loadings}{Total \:Var}= \dfrac{6.773}{20}\]</span></p>
 <p>Sum of squares of factor loadings (i.e., eigenvalue). <br> When in practice, CES-D items are often taken together and analyzed as one general factor, however, upon exploratory factor analysis, this model should be improved.</p>
@@ -1203,7 +1209,7 @@ onefactor$loadings
 ## SS loadings    6.773
 ## Proportion Var 0.339</code></pre>
 <pre class="r"><code>fa.diagram(twofactor)</code></pre>
-<p><img src="/post/EFA_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
 </div>
 <div id="visualization-of-correlation-matrix" class="section level4">
 <h4>Visualization of Correlation Matrix</h4>
@@ -1217,7 +1223,7 @@ corrplot(cor_matrix2$r,
          tl.col = &quot;black&quot;, 
          sig.level = 0.05, 
          insig = &quot;blank&quot;)</code></pre>
-<p><img src="/post/EFA_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<p><img src="/post/EFA_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
 <p>Compare to the onefactor model, the fit indices showed that the twofactor model has smaller RMSR, larger TLI, and smaller RMSEA. These indicate better fit than the onefactor model, but still not the optimal model. We also see that the correlation between the 2 factors is .62, which implies a moderate discriminant validity. There may or may not be a common underlying concept behind these 2 factors.</p>
 <p>Conceptually, the whole point of factor analysis is dimension reduction and create a parsimocious model. The onefactor model does not help to achieve this goal. Although the twofactor model is not optimal, but it provides better fit indices to explain observed data, larger proportion of variance can be explained by the two extracted latent variables than onefactor model.</p>
 <p>The twofactor model after oblique rotation creates a factor correlation matrix assuming intercorrelation between the factors. The structure matrix is calculated by multiplying the pattern matrix by the factor correlation matrix. Loadings in the structure matrix reflect both the unique relationship between the indicator and factor and the relationship between the indicator and the shared variance among the factors.</p>
