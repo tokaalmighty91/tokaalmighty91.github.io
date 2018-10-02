@@ -1,0 +1,236 @@
+---
+data: 2018-10-01
+title: "Exploratory Factor Analysis"
+type: "post"
+author: Toka Zhu
+draft: false
+---
+
+#Preparation
+```{r}
+setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Grad School Course Work/9555/Assignment/Assignment1')
+```
+###Install Packages
+```{r}
+#install.packages("Hmisc")
+#install.packages('corrplot')
+#install.packages('psych')
+#install.packages('nFactors')
+#install.packages('GPArotation')
+#install.packages('sem')
+```
+###Load libraries
+```{r message=FALSE, warning=FALSE, results='hide'}
+library(knitr)
+library(Hmisc)
+library(corrplot)
+library(psych)
+library(GPArotation)
+library(rmarkdown)
+library(sem)
+```
+
+#Data Manipulation
+##Subsetting 
+```{r}
+data<-read.csv('CESD.csv')
+
+# exclude variables cesdx4,cesdx8,cesdx12, cesdx16
+myvars <- names(data) %in% 
+          c("cesdx4", "cesdx8", "cesdx12", "cesdx16","gender") 
+data <- data[!myvars]
+```
+
+##Dealing with Missing Data
+```{r}
+nrow(data)
+# We are starting with 848 rows of entries, N = 848 .
+```
+```{r}
+# View first 6 lines of data
+kable(head(data))
+```
+
+```{r}
+# Get the number of Ss with more than 50% of missing answers
+length(which(rowMeans(is.na(data)) > 0.5))
+```
+
+```{r}
+# remove any row with more than 50% of missing answers
+data<- data[-which(rowMeans(is.na(data)) > 0.5) , ] 
+
+# view first 6 rows of cleaned data
+kable(head(data))
+```
+
+```{r}
+# After removing the 74 Ss with more than 50% missing answers
+# We ended with 774 Ss, the analysis will be conducted on N = 774
+nrow(data)
+```
+
+#Create Correlation Matrices
+##cor_matrix1, using pairwise-deletion 
+```{r}
+# Since the remaining Ss have answers to at least 50% of the 20 items.
+# I used pair-wise deletion to create the correlation matrix,
+# all 774 remaining Ss are preserved. 
+
+cor_matrix1<- cor(data, method = "pearson", 
+                  use = "pairwise.complete.obs")
+kable(round(cor_matrix1, 2))
+```
+
+##cor_matrix2, with significance levels
+```{r message=FALSE, warning=FALSE, results='hide'}
+# rcorr() from Hmisc package is used to compute significance levels for
+# pearson and spearman correlations. It returns both the correlation and
+# the p-value of all possible pairs of columns in the data
+cor_matrix2<- rcorr(as.matrix(data))
+```
+
+###Prettify cor_matrix2 (notes for self)
+```{r}
+# A function to format the correlation matrix
+flattenCorMatrix2 <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+# Create a pretty looking correlation matrix
+pretty_cormatrix2<-flattenCorMatrix2(cor_matrix2$r, cor_matrix2$P)
+
+# All p's are highly significant (roughly 0)
+# So I only display the first 6 row of pretty_cormatrix2
+kable(head(pretty_cormatrix2))
+```
+
+#Factor Extraction and Selection- Using psych package
+##Parallel Analysis Scree Plots
+```{r message=FALSE, warning=FALSE, results='hide'}
+# Determine Number of Factors to Extract
+# The factor should account for more variance than is 
+# expected by chance.
+parallel <- fa.parallel(data, 
+                        fm = 'ml', 
+                        fa = 'both')
+
+# Parallel analysis suggests that the number of factors =  5  
+# and the number of components =  2
+```
+
+##Factor Analysis
+###One factor solution
+```{r}
+# Use fa() function from 'psych' package. 
+# 'oblimin' is oblique rotation assuming factor dependency
+# Rotation does not change the one-factor solution
+# fm - using 'Maximum Likelihood' factor extraction
+onefactor <- fa(data,nfactors = 1,
+                 rotate = "oblimin",
+                 fm="ml")
+
+onefactor
+```
+
+I used recoded scales for item 4, 8, 12 and 16,
+therefore no negative loadings were expected.
+Negative loaded items measures opposite pole of the intended
+measured construct. The raw score of the item is subtracted rather
+than added; this is analogous to reverse-coded items.
+
+The onefactor model seemed to be a good fit seeing that RMSR < .08.
+However, significant $\chi^2$ test and RMSEA > .06 suggests that
+the correlation matrix predicted by the factor model parameter
+estimates differ from the sample correlation matrix.
+TLI < .95 indicating the model can be improved.
+
+```{r}
+# Getting % variance explained
+onefactor$loadings
+```
+
+```{r}
+fa.diagram(onefactor)
+```
+
+As we can clearly see through the ordered factor loading graph,
+all items had salient loadings ( >=.30) on this individual factor.
+12 items' loadings are practically high ( >.55), but in total
+only 34% of variance was explained by this factor. 
+
+
+$$\dfrac{Sum \:of \:squares\: of \:factor \:loadings}{Total \:Var}= \dfrac{6.773}{20}$$
+
+Sum of squares of factor loadings (i.e., eigenvalue). <br>
+When in practice, CES-D items are often taken together and analyzed
+as one general factor, however, upon exploratory factor analysis,
+this model should be improved.
+
+###Two factor solution
+```{r}
+twofactor <- fa(data,nfactors = 2,
+                 rotate = "oblimin",
+                 fm="ml")
+
+# % variance explained increased from 34% to 40%.
+twofactor
+```
+
+Item 4,8,12,16 loaded heavily on Factor2, and the rest of the item
+loaded heavily on Factor1. Each item only loaded high on one factor. 
+It is curious to see that one latent variable can be extracted from the 4 reverse-coded items and only the reverse-coded items. It makes me wonder if Ss are affected by the positive tone in these items thus an artificial latent variable was extracted. In other words, I think if these items were not reverse-coded (i.e., instead of 'I was happy' to 'I was unhappy'), the one factor model would suffice. Looking at the items loaded high on each factor, I would lable the factors 'Negative Items' and 'Positive Items'.
+
+```{r}
+# Relabel the 2 factors
+colnames(twofactor$loadings)<- c('Neg_Items', 'Pos_Items')
+# Set factor loading cutoff to be .3 (pattern matrix)
+print(twofactor$loadings,cutoff=.3)
+```
+```{r}
+# Recapture onefactor loadings (pattern matrix)
+onefactor$loadings
+```
+
+```{r}
+fa.diagram(twofactor)
+```
+
+###Visualization of Correlation Matrix
+```{r}
+# A direct way to see correlations among indicators
+# Insignificant correlations are left blank
+# Positive correlations are blue; negative correlations are red
+corrplot(cor_matrix2$r, 
+         type="upper", 
+         order="hclust", 
+         p.mat = cor_matrix2$P, 
+         tl.col = "black", 
+         sig.level = 0.05, 
+         insig = "blank")
+```
+
+Compare to the onefactor model, the fit indices showed that the
+twofactor model has smaller RMSR, larger TLI, and smaller RMSEA.
+These indicate better fit than the onefactor model, but still not
+the optimal model. We also see that the correlation between the 2 factors is .62, which implies a moderate discriminant validity. There may or may not be a common underlying concept behind these 2 factors.
+
+
+Conceptually, the whole point of factor analysis is dimension
+reduction and create a parsimocious model. The onefactor model does not help to achieve this goal. Although the twofactor model is not optimal, but it provides better fit indices to explain observed data, larger proportion of variance can be explained by the two extracted latent variables than onefactor model.
+
+
+The twofactor model after oblique rotation creates a factor correlation matrix assuming intercorrelation between the factors. The structure matrix is calculated by multiplying the pattern matrix by the factor correlation matrix. Loadings in the structure matrix reflect both the unique relationship between the indicator and factor and the relationship between the indicator and the shared variance among the factors.
+
+
+Resources: https://www.promptcloud.com/blog/exploratory-factor-analysis-in-r/
+
+
+
+
