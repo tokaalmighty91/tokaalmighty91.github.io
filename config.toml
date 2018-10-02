@@ -1,5 +1,5 @@
 baseurl = "https://tokaalmighty91.github.io/"
-title = "Creative portfolio"
+title = "CogSci to DatSci"
 theme = "hugo-creative-portfolio-theme"
 languageCode = "en-us"
 # Enable comments by entering your Disqus shortname
@@ -14,10 +14,10 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   # Use custom.css for your custom styling
   style = "default"
   description = "Describe your website"
-  copyright = "&copy;2016 Your name or company"
+  copyright = "&copy;2018 Brain and Mind Institute"
   sidebarAbout = [
-    "I am a PhD student in Cognitive Science with a passion for data science.",
-    "Western University"
+    "I am a PhD student in Cognitive Science with a passion for Data Science.",
+    "Based in London, Canada"
   ]
   # Contact page
      # Since this template is static, the contact form uses www.formspree.io as a
