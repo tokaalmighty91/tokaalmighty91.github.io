@@ -1,14 +1,14 @@
 ---
 data: 2018-10-01
-title: "Exploratory Factor Analysis"
+title: "Exploratory Factor Analysis using R"
 type: "post"
 author: Toka Zhu
 draft: false
 ---
 
-#Preparation
-```{r}
-setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Grad School Course Work/9555/Assignment/Assignment1')
+##Preparation
+```{r echo=FALSE}
+setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
 ```
 ###Install Packages
 ```{r}
@@ -30,8 +30,8 @@ library(rmarkdown)
 library(sem)
 ```
 
-#Data Manipulation
-##Subsetting 
+##Data Manipulation
+###Subsetting 
 ```{r}
 data<-read.csv('CESD.csv')
 
@@ -41,7 +41,7 @@ myvars <- names(data) %in%
 data <- data[!myvars]
 ```
 
-##Dealing with Missing Data
+###Dealing with Missing Data
 ```{r}
 nrow(data)
 # We are starting with 848 rows of entries, N = 848 .
@@ -70,8 +70,8 @@ kable(head(data))
 nrow(data)
 ```
 
-#Create Correlation Matrices
-##cor_matrix1, using pairwise-deletion 
+##Create Correlation Matrices
+###cor_matrix1, using pairwise-deletion 
 ```{r}
 # Since the remaining Ss have answers to at least 50% of the 20 items.
 # I used pair-wise deletion to create the correlation matrix,
@@ -82,7 +82,7 @@ cor_matrix1<- cor(data, method = "pearson",
 kable(round(cor_matrix1, 2))
 ```
 
-##cor_matrix2, with significance levels
+###cor_matrix2, with significance levels
 ```{r message=FALSE, warning=FALSE, results='hide'}
 # rcorr() from Hmisc package is used to compute significance levels for
 # pearson and spearman correlations. It returns both the correlation and
@@ -90,7 +90,7 @@ kable(round(cor_matrix1, 2))
 cor_matrix2<- rcorr(as.matrix(data))
 ```
 
-###Prettify cor_matrix2 (notes for self)
+####Prettify cor_matrix2 (notes for self)
 ```{r}
 # A function to format the correlation matrix
 flattenCorMatrix2 <- function(cormat, pmat) {
@@ -111,8 +111,8 @@ pretty_cormatrix2<-flattenCorMatrix2(cor_matrix2$r, cor_matrix2$P)
 kable(head(pretty_cormatrix2))
 ```
 
-#Factor Extraction and Selection- Using psych package
-##Parallel Analysis Scree Plots
+##Factor Extraction and Selection- Using psych package
+###Parallel Analysis Scree Plots
 ```{r message=FALSE, warning=FALSE, results='hide'}
 # Determine Number of Factors to Extract
 # The factor should account for more variance than is 
@@ -125,8 +125,8 @@ parallel <- fa.parallel(data,
 # and the number of components =  2
 ```
 
-##Factor Analysis
-###One factor solution
+###Factor Analysis
+####One factor solution
 ```{r}
 # Use fa() function from 'psych' package. 
 # 'oblimin' is oblique rotation assuming factor dependency
@@ -173,7 +173,7 @@ When in practice, CES-D items are often taken together and analyzed
 as one general factor, however, upon exploratory factor analysis,
 this model should be improved.
 
-###Two factor solution
+####Two factor solution
 ```{r}
 twofactor <- fa(data,nfactors = 2,
                  rotate = "oblimin",
@@ -202,7 +202,7 @@ onefactor$loadings
 fa.diagram(twofactor)
 ```
 
-###Visualization of Correlation Matrix
+####Visualization of Correlation Matrix
 ```{r}
 # A direct way to see correlations among indicators
 # Insignificant correlations are left blank
@@ -227,10 +227,5 @@ reduction and create a parsimocious model. The onefactor model does not help to 
 
 
 The twofactor model after oblique rotation creates a factor correlation matrix assuming intercorrelation between the factors. The structure matrix is calculated by multiplying the pattern matrix by the factor correlation matrix. Loadings in the structure matrix reflect both the unique relationship between the indicator and factor and the relationship between the indicator and the shared variance among the factors.
-
-
-Resources: https://www.promptcloud.com/blog/exploratory-factor-analysis-in-r/
-
-
 
 
