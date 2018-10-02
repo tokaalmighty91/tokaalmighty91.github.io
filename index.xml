@@ -161,15 +161,6 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
     </item>
     
     <item>
-      <title></title>
-      <link>https://tokaalmighty91.github.io/efa/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>https://tokaalmighty91.github.io/efa/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>Exploratory Factor Analysis using R</title>
       <link>https://tokaalmighty91.github.io/post/efa/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
