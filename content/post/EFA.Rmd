@@ -5,14 +5,12 @@ type: "post"
 author: Toka Zhu
 draft: false
 ---
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE)
-```
 
 ##Introduction
+
 In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below.
 
-```{r pressure, echo=FALSE, fig.cap="CESD Questionnaire", out.width = '100%'}
+```{r pressure, echo=FALSE, fig.cap="CESD Questionnaire", out.width = '80%'}
 setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
 
 knitr::include_graphics("EFA.png")
