@@ -161,13 +161,12 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
     </item>
     
     <item>
-      <title>Exploratory Factor Analysis using R</title>
+      <title></title>
       <link>https://tokaalmighty91.github.io/post/efa/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://tokaalmighty91.github.io/post/efa/</guid>
-      <description>Introduction In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below.
- Figure 1: CESD Questionnaire   Preparation Install Packages #install.packages(&amp;quot;Hmisc&amp;quot;) #install.packages(&amp;#39;corrplot&amp;#39;) #install.packages(&amp;#39;psych&amp;#39;) #install.packages(&amp;#39;nFactors&amp;#39;) #install.packages(&amp;#39;GPArotation&amp;#39;) #install.packages(&amp;#39;sem&amp;#39;)  Load libraries library(knitr) library(Hmisc) library(corrplot) library(psych) library(GPArotation) library(rmarkdown) library(sem)   Data Manipulation Subsetting data&amp;lt;-read.csv(&amp;#39;CESD.csv&amp;#39;) # exclude variables cesdx4,cesdx8,cesdx12, cesdx16 myvars &amp;lt;- names(data) %in% c(&amp;quot;cesdx4&amp;quot;, &amp;quot;cesdx8&amp;quot;, &amp;quot;cesdx12&amp;quot;, &amp;quot;cesdx16&amp;quot;,&amp;quot;gender&amp;quot;) data &amp;lt;- data[!</description>
+      <description>Exploratory Factor Analysis using R       code{white-space: pre;} pre:not([class]) { background-color: white; }  if (window.hljs) { hljs.configure({languages: []}); hljs.initHighlightingOnLoad(); if (document.readyState &amp;&amp; document.readyState === &#34;complete&#34;) { window.setTimeout(function() { hljs.initHighlighting(); }, 0); } }  h1 { font-size: 34px; } h1.title { font-size: 38px; } h2 { font-size: 30px; } h3 { font-size: 24px; } h4 { font-size: 18px; } h5 { font-size: 16px; } h6 { font-size: 12px; } .</description>
     </item>
     
   </channel>
