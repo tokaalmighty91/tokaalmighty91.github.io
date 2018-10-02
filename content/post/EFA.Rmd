@@ -5,6 +5,9 @@ type: "post"
 author: Toka Zhu
 draft: false
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
 
 ##Preparation
 ```{r echo=FALSE}
