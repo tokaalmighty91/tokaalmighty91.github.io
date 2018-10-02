@@ -17,7 +17,7 @@ ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
   copyright = "&copy;2016 Your name or company"
   sidebarAbout = [
     "I am a creative illustrator and graphic designer with more than 10 years of experience.",
-    "Originally from Toronto, currently based in London."
+    "Western University"
   ]
   # Contact page
      # Since this template is static, the contact form uses www.formspree.io as a
