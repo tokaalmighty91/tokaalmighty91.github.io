@@ -9,7 +9,7 @@ draft: false
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-
+##Introduction
 In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below.
 
 ```{r pressure, echo=FALSE, fig.cap="CESD Questionnaire", out.width = '100%'}
