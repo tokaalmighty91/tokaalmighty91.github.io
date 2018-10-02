@@ -6,6 +6,10 @@ author: Toka Zhu
 draft: false
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
 ##Preparation
 ```{r echo=FALSE}
 setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
