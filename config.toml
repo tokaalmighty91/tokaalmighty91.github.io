@@ -6,7 +6,7 @@ languageCode = "en-us"
 disqusShortname = ""
 # Enable Google Analytics by entering your tracking code
 googleAnalytics = ""
-publishDir = "tokaalmighty91.github.io"
+#publishDir = "tokaalmighty91.github.io"
 
 [params]
   # Style options: default (pink), blue, green, pink, red, sea, violet
