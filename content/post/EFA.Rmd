@@ -11,7 +11,7 @@ knitr::opts_chunk$set(collapse = TRUE)
 
 ##Introduction
 
-In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below. Item 4, 8, 12, 16 are reverse-coded.![](EFA.png){width=80%}
+In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below. Item 4, 8, 12, 16 are reverse-coded.![](/post/EFA_files/EFA.png){width=80%}
 
 ```{r echo = FALSE}
 setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
