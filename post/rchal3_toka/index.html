@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Converting from wide to long format &amp; Simple ANOVA in R</title>
+<meta name="description" content="Describe your website">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/owl.theme.css">
+
+
+  <link href="https://tokaalmighty91.github.io/css/style.default.css" rel="stylesheet" id="theme-stylesheet">
+
+ 
+
+  
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+
+<link href="https://tokaalmighty91.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://tokaalmighty91.github.io/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="https://tokaalmighty91.github.io/">CogSci to DatSci</a></h1>
+    
+      <p class="sidebar-p">I am a PhD student in Cognitive Science with a passion for Data Science.</p>
+    
+      <p class="sidebar-p">Based in London, Canada</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="https://tokaalmighty91.github.io/portfolio/">Home</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/about/">About</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/post/">Post</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/contact/">Get in touch</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  <a href="full%20profile%20url%20in%20twitter" data-animate-hover="pulse" class="external twitter">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  <a href="mailto:email@example.com" data-animate-hover="pulse" class="email">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse" class="external">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse" class="external">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2018 Brain and Mind Institute
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="https://tokaalmighty91.github.io/">CogSci to DatSci</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Converting from wide to long format &amp; Simple ANOVA in R</h1>
+         <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In this post, I will discuss about how to convert data from wide format to long format; how to create a 2D figure with information from 3 variables; and how to conduct ANOVA in 3 different ways.</p>
+<p>The data in today’s example was collected by our lab (led by Dr. Paul Minda) for the purpose of predicting category-learning on two types of categories (i.e.,RD: Rule-defined, and II: Information Integration). Columns from B to AY are all predictive variables. Columns from AZ to BC are the % correct (i.e., performance) in the 4 blocks of trails from either RD or II. Participants were assigned in either RD or II for all 4 blocks. Column BD is the average performance across the 4 blocks for each participant. We will be taking specific predictive variables as examples to explore their relationship with the outcome variable (i.e., performance)</p>
+<p><b>Below are the specific instructions we will be following:</b></p>
+<p>*First, create a new data frame that takes the column with performance in each block (AZ-BC) and puts them into a single column called PERFORMANCE and the a new column called “BLOCK” with 1,2,3,4 as values. This new frame will be four times taller, but does not need to include every variables, only the ones you need.</p>
+<p>*Generate a line plot with errorbars (or points) that show PERFORMANCE with BLOCK as X-Axis and different lines for Category. Decide on the best way to also show MONTH (same plot different line, or separate plots)</p>
+<p>*Run a mixed factor ANOVA on PERFORMANCE with BLOCK as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: PERFORMANCE with BLOCK (within) and CATEGORY, MONTH, and TIME and between.</p>
+</div>
+<div id="preparation" class="section level2">
+<h2>Preparation</h2>
+<div id="install-packages" class="section level3">
+<h3>Install Packages</h3>
+<pre class="r"><code>#install.packages(&#39;prettydoc&#39;)
+#install.packages(&#39;lme4&#39;)
+#install.packages(&#39;ez&#39;, dependencies = TRUE)
+#install.packages(&#39;data.table&#39;, dependencies= TRUE)
+#install.packages(&#39;afex&#39;)</code></pre>
+</div>
+<div id="load-packages" class="section level3">
+<h3>Load packages</h3>
+<pre class="r"><code>library(prettydoc)
+library(rmarkdown)
+library(Rmisc)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(ez)
+library(knitr)
+library(tidyr)
+library(tidyverse)
+library(lme4)</code></pre>
+</div>
+</div>
+<div id="data-manipulation" class="section level2">
+<h2>Data Manipulation</h2>
+<div id="subsetting-and-relabelling" class="section level3">
+<h3>Subsetting and Relabelling</h3>
+<pre class="r"><code>data&lt;-read_excel(&#39;ModifiedFullData.xlsx&#39;)
+
+# Select relevant columns
+data&lt;-data[c(&#39;SubjNum&#39;,&#39;Cat&#39;,&#39;Month&#39;,&#39;DayofWeek&#39;,&#39;Time2&#39;,
+            &#39;1_Block&#39;,&#39;2_Block&#39;,&#39;3_Block&#39;,&#39;4_Block&#39;,&#39;Total&#39;)]
+
+# Rename columns
+data&lt;-rename(data,
+            Ss=SubjNum,
+            Cat=Cat,
+            Month=Month,
+            DayofWeek=DayofWeek,
+            Time=Time2,
+            &#39;1&#39;=&#39;1_Block&#39;,
+            &#39;2&#39;=&#39;2_Block&#39;,
+            &#39;3&#39;=&#39;3_Block&#39;,
+            &#39;4&#39;=&#39;4_Block&#39;,
+            &#39;Total&#39;=&#39;Total&#39;)
+
+# Convert Subject into factor
+data$Ss &lt;- factor(data$Ss)
+
+# Drop May data due to incomplete comparison groups
+data &lt;- subset(data, Month != &quot;05_May&quot;)
+
+# View head of data
+kable(head(data))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Ss</th>
+<th align="left">Cat</th>
+<th align="left">Month</th>
+<th align="left">DayofWeek</th>
+<th align="left">Time</th>
+<th align="right">1</th>
+<th align="right">2</th>
+<th align="right">3</th>
+<th align="right">4</th>
+<th align="right">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">1Morning</td>
+<td align="right">0.5750</td>
+<td align="right">0.7000</td>
+<td align="right">0.7250</td>
+<td align="right">0.6000</td>
+<td align="right">0.6500</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">2Early Afternoon</td>
+<td align="right">0.6750</td>
+<td align="right">0.7000</td>
+<td align="right">0.7500</td>
+<td align="right">0.7875</td>
+<td align="right">0.7281</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">2Early Afternoon</td>
+<td align="right">0.6375</td>
+<td align="right">0.6875</td>
+<td align="right">0.6625</td>
+<td align="right">0.6500</td>
+<td align="right">0.6594</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">1Morning</td>
+<td align="right">0.6750</td>
+<td align="right">0.8500</td>
+<td align="right">0.8000</td>
+<td align="right">0.8750</td>
+<td align="right">0.8000</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">3_Wed</td>
+<td align="left">1Morning</td>
+<td align="right">0.5875</td>
+<td align="right">0.6000</td>
+<td align="right">0.7375</td>
+<td align="right">0.7375</td>
+<td align="right">0.6656</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">3_Wed</td>
+<td align="left">1Morning</td>
+<td align="right">0.7125</td>
+<td align="right">0.7500</td>
+<td align="right">0.7625</td>
+<td align="right">0.8000</td>
+<td align="right">0.7563</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="changing-data-from-wide-to-long-form" class="section level3">
+<h3>Changing Data from Wide to Long Form</h3>
+<pre class="r"><code># Transform data from wide to long form using &#39;tidyr&#39; package
+data_long &lt;- gather(data, block, accuracy, &#39;1&#39;:&#39;4&#39;, 
+                    factor_key=TRUE)
+
+# Make sure block is a factor
+data_long$block=factor(data_long$block)
+kable(head(data_long))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Ss</th>
+<th align="left">Cat</th>
+<th align="left">Month</th>
+<th align="left">DayofWeek</th>
+<th align="left">Time</th>
+<th align="right">Total</th>
+<th align="left">block</th>
+<th align="right">accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">1Morning</td>
+<td align="right">0.6500</td>
+<td align="left">1</td>
+<td align="right">0.5750</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">2Early Afternoon</td>
+<td align="right">0.7281</td>
+<td align="left">1</td>
+<td align="right">0.6750</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">2Early Afternoon</td>
+<td align="right">0.6594</td>
+<td align="left">1</td>
+<td align="right">0.6375</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">2_Tue</td>
+<td align="left">1Morning</td>
+<td align="right">0.8000</td>
+<td align="left">1</td>
+<td align="right">0.6750</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">II</td>
+<td align="left">04_Apr</td>
+<td align="left">3_Wed</td>
+<td align="left">1Morning</td>
+<td align="right">0.6656</td>
+<td align="left">1</td>
+<td align="right">0.5875</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">RD</td>
+<td align="left">04_Apr</td>
+<td align="left">3_Wed</td>
+<td align="left">1Morning</td>
+<td align="right">0.7563</td>
+<td align="left">1</td>
+<td align="right">0.7125</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="data-visualization" class="section level2">
+<h2>Data Visualization</h2>
+<div id="plotting-performance-change-across-blocks" class="section level3">
+<h3>Plotting performance change across blocks</h3>
+<pre class="r"><code># Create summary table for block performance on each category type
+summary_Block&lt;-summarySE(data_long,                               
+                         measurevar=&#39;accuracy&#39;,
+                         groupvars=c(&#39;Cat&#39;,&#39;block&#39;))
+
+kable(summary_Block)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Cat</th>
+<th align="left">block</th>
+<th align="right">N</th>
+<th align="right">accuracy</th>
+<th align="right">sd</th>
+<th align="right">se</th>
+<th align="right">ci</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">II</td>
+<td align="left">1</td>
+<td align="right">207</td>
+<td align="right">0.6154589</td>
+<td align="right">0.0740299</td>
+<td align="right">0.0051454</td>
+<td align="right">0.0101445</td>
+</tr>
+<tr class="even">
+<td align="left">II</td>
+<td align="left">2</td>
+<td align="right">207</td>
+<td align="right">0.6585749</td>
+<td align="right">0.0922209</td>
+<td align="right">0.0064098</td>
+<td align="right">0.0126372</td>
+</tr>
+<tr class="odd">
+<td align="left">II</td>
+<td align="left">3</td>
+<td align="right">207</td>
+<td align="right">0.6783213</td>
+<td align="right">0.1025849</td>
+<td align="right">0.0071301</td>
+<td align="right">0.0140574</td>
+</tr>
+<tr class="even">
+<td align="left">II</td>
+<td align="left">4</td>
+<td align="right">207</td>
+<td align="right">0.6820235</td>
+<td align="right">0.1137517</td>
+<td align="right">0.0079063</td>
+<td align="right">0.0155876</td>
+</tr>
+<tr class="odd">
+<td align="left">RD</td>
+<td align="left">1</td>
+<td align="right">249</td>
+<td align="right">0.6674711</td>
+<td align="right">0.1195377</td>
+<td align="right">0.0075754</td>
+<td align="right">0.0149203</td>
+</tr>
+<tr class="even">
+<td align="left">RD</td>
+<td align="left">2</td>
+<td align="right">249</td>
+<td align="right">0.7748494</td>
+<td align="right">0.1291376</td>
+<td align="right">0.0081838</td>
+<td align="right">0.0161185</td>
+</tr>
+<tr class="odd">
+<td align="left">RD</td>
+<td align="left">3</td>
+<td align="right">249</td>
+<td align="right">0.7876004</td>
+<td align="right">0.1250604</td>
+<td align="right">0.0079254</td>
+<td align="right">0.0156096</td>
+</tr>
+<tr class="even">
+<td align="left">RD</td>
+<td align="left">4</td>
+<td align="right">249</td>
+<td align="right">0.7935137</td>
+<td align="right">0.1308778</td>
+<td align="right">0.0082940</td>
+<td align="right">0.0163357</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Plot accuracy change across blocks
+ggplot(summary_Block, aes(block, accuracy, 
+            color= Cat, group= Cat)) + 
+    geom_line() +  
+  
+# add errorbar
+    geom_errorbar(aes(ymin=accuracy-se, ymax=accuracy+se),
+                colour=&quot;black&quot;, width=.1) +
+  
+# add labels and titles
+    labs(x= &quot;Block&quot;, y= &quot;Accuracy&quot;) +
+    scale_colour_hue(name=&quot;Category Type&quot;,   
+                     breaks=c(&quot;RD&quot;, &quot;II&quot;),
+                     labels=c(&quot;Rule_Defined&quot;, 
+                              &quot;Information_Integration&quot;)) +                   
+    ggtitle(&quot;Performance Change across Blocks&quot;) +
+    theme(plot.title= element_text(hjust= 0.5)) +
+  
+# set range of y
+    ylim(.5, .85) +                        
+    theme_light() +
+  
+# Position legend in bottom right
+    theme(legend.justification=c(1,0),
+          legend.position=c(1,0))               </code></pre>
+<p><img src="/post/RChal3_Toka_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="plotting-4-blocks-performance-change-across-the-months" class="section level3">
+<h3>Plotting 4 Blocks’ Performance change across the Months</h3>
+<pre class="r"><code># Create summary table for plotting accuracy change across months
+summary_Month&lt;-summarySE(data_long,                               
+                         measurevar=&#39;accuracy&#39;,
+                         groupvars=c(&#39;block&#39;,&#39;Month&#39;,&#39;Cat&#39;))
+
+kable(head(summary_Month))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">block</th>
+<th align="left">Month</th>
+<th align="left">Cat</th>
+<th align="right">N</th>
+<th align="right">accuracy</th>
+<th align="right">sd</th>
+<th align="right">se</th>
+<th align="right">ci</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">01_Jan</td>
+<td align="left">II</td>
+<td align="right">39</td>
+<td align="right">0.6314103</td>
+<td align="right">0.0799296</td>
+<td align="right">0.0127990</td>
+<td align="right">0.0259102</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">01_Jan</td>
+<td align="left">RD</td>
+<td align="right">25</td>
+<td align="right">0.7140000</td>
+<td align="right">0.1281540</td>
+<td align="right">0.0256308</td>
+<td align="right">0.0528994</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">02_Feb</td>
+<td align="left">II</td>
+<td align="right">24</td>
+<td align="right">0.5864583</td>
+<td align="right">0.0763392</td>
+<td align="right">0.0155827</td>
+<td align="right">0.0322352</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">02_Feb</td>
+<td align="left">RD</td>
+<td align="right">15</td>
+<td align="right">0.6627867</td>
+<td align="right">0.1144415</td>
+<td align="right">0.0295487</td>
+<td align="right">0.0633756</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">03_Mar</td>
+<td align="left">II</td>
+<td align="right">31</td>
+<td align="right">0.5850806</td>
+<td align="right">0.0638536</td>
+<td align="right">0.0114684</td>
+<td align="right">0.0234217</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">03_Mar</td>
+<td align="left">RD</td>
+<td align="right">33</td>
+<td align="right">0.6370000</td>
+<td align="right">0.1245008</td>
+<td align="right">0.0216728</td>
+<td align="right">0.0441460</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Plot individual block performance across the months
+# Figures are seperated by Category Type
+ggplot(summary_Month, aes(Month, accuracy, 
+            color= block)) +
+    geom_line(aes(group = block)) +
+    geom_point(aes(shape = block), size = 3) +
+    facet_wrap(~Cat) +
+    scale_x_discrete(labels = c(&quot;01_Jan&quot; = &quot;Jan&quot;, &quot;02_Feb&quot; = &quot;Feb&quot;,
+                              &quot;03_Mar&quot; = &quot;Mar&quot;, &quot;04_Apr&quot; = &quot;Apr&quot;,
+                              &quot;05_May&quot; = &quot;May&quot;, &quot;09_Sep&quot; = &quot;Sept&quot;,
+                              &quot;10_Oct&quot; = &quot;Oct&quot;, &quot;11_Nov&quot; = &quot;Nov&quot;))+
+  
+    theme_update(plot.title= element_text(hjust= 0.8)) +
+    ggtitle(&quot;Block Performance across Different Months&quot;) +
+  
+# set range of y
+    ylim(.5, .85) +                        
+    theme_light() </code></pre>
+<p><img src="/post/RChal3_Toka_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="create-a-summary-table-of-data" class="section level4">
+<h4>Create a summary table of data</h4>
+<pre class="r"><code># We want create a summary table to see the N for each month
+# Should not interpret the graph without knowing the sample size
+summary_data&lt;-summarySE(data,                               
+                         measurevar=&#39;Total&#39;,
+                         groupvars=c(&#39;Month&#39;,&#39;Cat&#39;))
+
+kable(summary_data)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Month</th>
+<th align="left">Cat</th>
+<th align="right">N</th>
+<th align="right">Total</th>
+<th align="right">sd</th>
+<th align="right">se</th>
+<th align="right">ci</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">01_Jan</td>
+<td align="left">II</td>
+<td align="right">39</td>
+<td align="right">0.6736429</td>
+<td align="right">0.0864726</td>
+<td align="right">0.0138467</td>
+<td align="right">0.0280312</td>
+</tr>
+<tr class="even">
+<td align="left">01_Jan</td>
+<td align="left">RD</td>
+<td align="right">25</td>
+<td align="right">0.7771440</td>
+<td align="right">0.1099014</td>
+<td align="right">0.0219803</td>
+<td align="right">0.0453651</td>
+</tr>
+<tr class="odd">
+<td align="left">02_Feb</td>
+<td align="left">II</td>
+<td align="right">24</td>
+<td align="right">0.6351750</td>
+<td align="right">0.0635108</td>
+<td align="right">0.0129641</td>
+<td align="right">0.0268183</td>
+</tr>
+<tr class="even">
+<td align="left">02_Feb</td>
+<td align="left">RD</td>
+<td align="right">15</td>
+<td align="right">0.7252933</td>
+<td align="right">0.1395733</td>
+<td align="right">0.0360377</td>
+<td align="right">0.0772931</td>
+</tr>
+<tr class="odd">
+<td align="left">03_Mar</td>
+<td align="left">II</td>
+<td align="right">31</td>
+<td align="right">0.6097871</td>
+<td align="right">0.0790917</td>
+<td align="right">0.0142053</td>
+<td align="right">0.0290111</td>
+</tr>
+<tr class="even">
+<td align="left">03_Mar</td>
+<td align="left">RD</td>
+<td align="right">33</td>
+<td align="right">0.7215545</td>
+<td align="right">0.1271817</td>
+<td align="right">0.0221395</td>
+<td align="right">0.0450967</td>
+</tr>
+<tr class="odd">
+<td align="left">04_Apr</td>
+<td align="left">II</td>
+<td align="right">31</td>
+<td align="right">0.6534290</td>
+<td align="right">0.0808244</td>
+<td align="right">0.0145165</td>
+<td align="right">0.0296466</td>
+</tr>
+<tr class="even">
+<td align="left">04_Apr</td>
+<td align="left">RD</td>
+<td align="right">41</td>
+<td align="right">0.7533683</td>
+<td align="right">0.1139496</td>
+<td align="right">0.0177959</td>
+<td align="right">0.0359669</td>
+</tr>
+<tr class="odd">
+<td align="left">09_Sep</td>
+<td align="left">II</td>
+<td align="right">27</td>
+<td align="right">0.7001296</td>
+<td align="right">0.0557126</td>
+<td align="right">0.0107219</td>
+<td align="right">0.0220392</td>
+</tr>
+<tr class="even">
+<td align="left">09_Sep</td>
+<td align="left">RD</td>
+<td align="right">68</td>
+<td align="right">0.7875217</td>
+<td align="right">0.0850403</td>
+<td align="right">0.0103127</td>
+<td align="right">0.0205841</td>
+</tr>
+<tr class="odd">
+<td align="left">10_Oct</td>
+<td align="left">II</td>
+<td align="right">45</td>
+<td align="right">0.6659231</td>
+<td align="right">0.0807144</td>
+<td align="right">0.0120322</td>
+<td align="right">0.0242493</td>
+</tr>
+<tr class="even">
+<td align="left">10_Oct</td>
+<td align="left">RD</td>
+<td align="right">63</td>
+<td align="right">0.7410893</td>
+<td align="right">0.0721438</td>
+<td align="right">0.0090893</td>
+<td align="right">0.0181692</td>
+</tr>
+<tr class="odd">
+<td align="left">11_Nov</td>
+<td align="left">II</td>
+<td align="right">10</td>
+<td align="right">0.6784375</td>
+<td align="right">0.0765388</td>
+<td align="right">0.0242037</td>
+<td align="right">0.0547525</td>
+</tr>
+<tr class="even">
+<td align="left">11_Nov</td>
+<td align="left">RD</td>
+<td align="right">4</td>
+<td align="right">0.7417468</td>
+<td align="right">0.0318693</td>
+<td align="right">0.0159346</td>
+<td align="right">0.0507111</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>
+# From this table we can see there were only 4 participants assigned to
+# RD category in Nov, therefore, it is too small of a sample size to
+# say that people perform worse in Nov.</code></pre>
+</div>
+</div>
+</div>
+<div id="mixed-anovas" class="section level2">
+<h2>Mixed ANOVAs</h2>
+<div id="using-aov-function" class="section level3">
+<h3>Using aov function</h3>
+<pre class="r"><code># mixed ANOVA using aov: with &#39;block&#39; as within-IV, &#39;Cat&#39;,&#39;Month&#39;,&#39;Time&#39; as between-IV, accuracy is DV
+anova1&lt;-aov(accuracy~block*Cat*Month*Time+
+            Error(Ss/block)+(Cat*Month*Time),
+            data=data_long)
+summary(anova1)
+## 
+## Error: Ss
+##                 Df Sum Sq Mean Sq F value  Pr(&gt;F)    
+## Cat              1  2.176  2.1761  57.384 2.2e-12 ***
+## Month            6  0.244  0.0406   1.071  0.3821    
+## Time             2  0.051  0.0253   0.667  0.5145    
+## Cat:Month        6  0.225  0.0376   0.990  0.4335    
+## Cat:Time         2  0.013  0.0067   0.177  0.8377    
+## Month:Time      11  0.431  0.0392   1.032  0.4200    
+## Cat:Month:Time  10  0.767  0.0767   2.022  0.0338 *  
+## Residuals      170  6.447  0.0379                    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Error: Ss:block
+##                       Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## block                  3 2.9068  0.9689 217.913  &lt; 2e-16 ***
+## block:Cat              3 0.1833  0.0611  13.740 1.25e-08 ***
+## block:Month           18 0.0670  0.0037   0.837    0.657    
+## block:Time             6 0.0654  0.0109   2.451    0.024 *  
+## block:Cat:Month       18 0.1009  0.0056   1.261    0.208    
+## block:Cat:Time         6 0.0198  0.0033   0.740    0.617    
+## block:Month:Time      33 0.1554  0.0047   1.059    0.382    
+## block:Cat:Month:Time  30 0.1606  0.0054   1.204    0.213    
+## Residuals            510 2.2677  0.0044                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Error: Within
+##                       Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## Cat                    1  2.102  2.1024 176.146  &lt; 2e-16 ***
+## Month                  6  0.950  0.1583  13.260 2.18e-14 ***
+## Time                   2  0.047  0.0234   1.962   0.1412    
+## block:Cat              3  0.131  0.0436   3.653   0.0123 *  
+## block:Month           18  0.132  0.0073   0.613   0.8913    
+## Cat:Month              6  0.401  0.0668   5.595 1.05e-05 ***
+## block:Time             6  0.068  0.0114   0.953   0.4560    
+## Cat:Time               2  0.092  0.0459   3.849   0.0217 *  
+## Month:Time            10  0.266  0.0266   2.229   0.0146 *  
+## block:Cat:Month       18  0.087  0.0048   0.406   0.9870    
+## block:Cat:Time         6  0.007  0.0012   0.103   0.9960    
+## block:Month:Time      30  0.129  0.0043   0.360   0.9994    
+## Cat:Month:Time        10  0.239  0.0239   2.005   0.0302 *  
+## block:Cat:Month:Time  30  0.059  0.0020   0.164   1.0000    
+## Residuals            840 10.026  0.0119                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+</div>
+<div id="using-ezanova.-returns-1-or-more-cell-with-missing-data-error." class="section level3">
+<h3>Using ezANOVA. Returns 1 or more cell with missing data error.</h3>
+<pre class="r"><code># ezANOVA returns error
+# anova2&lt;-ezANOVA(data= data_long,
+#                 dv= .(accuracy),
+#                 wid= .(Ss),
+#                 within= .(block),
+#                 between= .(Month, Time, Cat),
+#                 type= 3, detailed= TRUE)</code></pre>
+</div>
+<div id="using-lme4.-still-need-more-work-on-this." class="section level3">
+<h3>Using lme4. Still need more work on this.</h3>
+<pre class="r"><code># &#39;block&#39;, &#39;Cat&#39;, &#39;Month&#39;, &#39;Time&#39; are fixed effects
+# &#39;Ss&#39; is random effects
+fullmodel_lmer &lt;- lmer(accuracy ~ block + Cat + Month + Time +
+                       (1|Ss), data_long, REML=FALSE)
+
+# Check how to interpret summary output
+summary(fullmodel_lmer)
+## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: accuracy ~ block + Cat + Month + Time + (1 | Ss)
+##    Data: data_long
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##  -3062.4  -2979.8   1546.2  -3092.4     1809 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.4090 -0.4936  0.1313  0.6293  2.7458 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  Ss       (Intercept) 0.003629 0.06024 
+##  Residual             0.009114 0.09547 
+## Number of obs: 1824, groups:  Ss, 209
+## 
+## Fixed effects:
+##                       Estimate Std. Error t value
+## (Intercept)           0.619213   0.010263  60.336
+## block2                0.078207   0.006322  12.370
+## block3                0.094133   0.006322  14.889
+## block4                0.099043   0.006322  15.665
+## CatRD                 0.091931   0.006053  15.188
+## Month02_Feb          -0.045351   0.011786  -3.848
+## Month03_Mar          -0.064743   0.010423  -6.212
+## Month04_Apr          -0.024326   0.010362  -2.348
+## Month09_Sep           0.015297   0.009968   1.535
+## Month10_Oct          -0.023836   0.008606  -2.770
+## Month11_Nov          -0.039478   0.021244  -1.858
+## Time2Early Afternoon -0.010187   0.006666  -1.528
+## Time3LateAfternoon    0.005343   0.007804   0.685</code></pre>
+</div>
+</div>
+
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="https://tokaalmighty91.github.io/js/jquery.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/bootstrap.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/jquery.cookie.js"> </script>
+<script src="https://tokaalmighty91.github.io/js/ekko-lightbox.js"></script>
+<script src="https://tokaalmighty91.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/owl.carousel.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/front.js"></script>
+
+</body>
+</html>
