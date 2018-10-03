@@ -1,0 +1,227 @@
+---
+title: "Converting from wide to long format & Simple ANOVA in R"
+subtitle: "Lab Code Challenge 3"
+author: "Toka"
+date: 2018-09-25T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "lab code challenge"]
+---
+
+##Introduction
+
+In this post, I will discuss about how to convert data from wide format to long format; how to create a 2D figure with information from 3 variables; and how to conduct ANOVA in 3 different ways.
+
+The data in today's example was collected by our lab (led by Dr. Paul Minda) for the purpose of predicting category-learning on two types of categories (i.e.,RD: Rule-defined, and II: Information Integration). Columns from B to AY are all predictive variables. Columns from AZ to BC are the % correct (i.e., performance) in the 4 blocks of trails from either RD or II. Participants were assigned in either RD or II for all 4 blocks. Column BD is the average performance across the 4 blocks for each participant. We will be taking specific predictive variables as examples to explore their relationship with the outcome variable (i.e., performance)
+
+<b>Below are the specific instructions we will be following:</b>
+
+*First, create a new data frame that takes the column with performance in each block (AZ-BC) and puts them into a single column called PERFORMANCE and the a new column called “BLOCK” with 1,2,3,4 as values. This new frame will be four times taller, but does not need to include every variables, only the ones you need.
+
+*Generate a line plot with errorbars (or points) that show PERFORMANCE with BLOCK as X-Axis and different lines for Category. Decide on the best way to also show MONTH (same plot different line, or separate plots)
+
+*Run a mixed factor ANOVA on PERFORMANCE with BLOCK as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: PERFORMANCE with BLOCK (within) and CATEGORY, MONTH, and TIME and between.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+```{r echo=FALSE}
+setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
+```
+
+##Preparation
+###Install Packages
+```{r message=FALSE, warning=FALSE, results='hide'}
+#install.packages('prettydoc')
+#install.packages('lme4')
+#install.packages('ez', dependencies = TRUE)
+#install.packages('data.table', dependencies= TRUE)
+#install.packages('afex')
+```
+###Load packages
+```{r message=FALSE, warning=FALSE, results='hide'}
+library(prettydoc)
+library(rmarkdown)
+library(Rmisc)
+library(readxl)
+library(ggplot2)
+library(data.table)
+library(ez)
+library(knitr)
+library(tidyr)
+library(tidyverse)
+library(lme4)
+
+```
+
+##Data Manipulation
+###Subsetting and Relabelling
+```{r}
+data<-read_excel('ModifiedFullData.xlsx')
+
+# Select relevant columns
+data<-data[c('SubjNum','Cat','Month','DayofWeek','Time2',
+            '1_Block','2_Block','3_Block','4_Block','Total')]
+
+# Rename columns
+data<-rename(data,
+            Ss=SubjNum,
+            Cat=Cat,
+            Month=Month,
+            DayofWeek=DayofWeek,
+            Time=Time2,
+            '1'='1_Block',
+            '2'='2_Block',
+            '3'='3_Block',
+            '4'='4_Block',
+            'Total'='Total')
+
+# Convert Subject into factor
+data$Ss <- factor(data$Ss)
+
+# Drop May data due to incomplete comparison groups
+data <- subset(data, Month != "05_May")
+
+# View head of data
+kable(head(data))
+```
+
+###Changing Data from Wide to Long Form
+```{r}
+# Transform data from wide to long form using 'tidyr' package
+data_long <- gather(data, block, accuracy, '1':'4', 
+                    factor_key=TRUE)
+
+# Make sure block is a factor
+data_long$block=factor(data_long$block)
+kable(head(data_long))
+```
+
+##Data Visualization
+
+###Plotting performance change across blocks
+```{r}
+# Create summary table for block performance on each category type
+summary_Block<-summarySE(data_long,                               
+                         measurevar='accuracy',
+                         groupvars=c('Cat','block'))
+
+kable(summary_Block)
+```
+
+```{r}
+# Plot accuracy change across blocks
+ggplot(summary_Block, aes(block, accuracy, 
+            color= Cat, group= Cat)) + 
+    geom_line() +  
+  
+# add errorbar
+    geom_errorbar(aes(ymin=accuracy-se, ymax=accuracy+se),
+                colour="black", width=.1) +
+  
+# add labels and titles
+    labs(x= "Block", y= "Accuracy") +
+    scale_colour_hue(name="Category Type",   
+                     breaks=c("RD", "II"),
+                     labels=c("Rule_Defined", 
+                              "Information_Integration")) +                   
+    ggtitle("Performance Change across Blocks") +
+    theme(plot.title= element_text(hjust= 0.5)) +
+  
+# set range of y
+    ylim(.5, .85) +                        
+    theme_light() +
+  
+# Position legend in bottom right
+    theme(legend.justification=c(1,0),
+          legend.position=c(1,0))               
+```
+
+###Plotting 4 Blocks' Performance change across the Months
+```{r}
+# Create summary table for plotting accuracy change across months
+summary_Month<-summarySE(data_long,                               
+                         measurevar='accuracy',
+                         groupvars=c('block','Month','Cat'))
+
+kable(head(summary_Month))
+```
+
+```{r}
+# Plot individual block performance across the months
+# Figures are seperated by Category Type
+ggplot(summary_Month, aes(Month, accuracy, 
+            color= block)) +
+    geom_line(aes(group = block)) +
+    geom_point(aes(shape = block), size = 3) +
+    facet_wrap(~Cat) +
+    scale_x_discrete(labels = c("01_Jan" = "Jan", "02_Feb" = "Feb",
+                              "03_Mar" = "Mar", "04_Apr" = "Apr",
+                              "05_May" = "May", "09_Sep" = "Sept",
+                              "10_Oct" = "Oct", "11_Nov" = "Nov"))+
+  
+    theme_update(plot.title= element_text(hjust= 0.8)) +
+    ggtitle("Block Performance across Different Months") +
+  
+# set range of y
+    ylim(.5, .85) +                        
+    theme_light() 
+```
+
+####Create a summary table of data
+```{r}
+# We want create a summary table to see the N for each month
+# Should not interpret the graph without knowing the sample size
+summary_data<-summarySE(data,                               
+                         measurevar='Total',
+                         groupvars=c('Month','Cat'))
+
+kable(summary_data)
+
+# From this table we can see there were only 4 participants assigned to
+# RD category in Nov, therefore, it is too small of a sample size to
+# say that people perform worse in Nov.
+```
+
+##Mixed ANOVAs 
+###Using aov function
+```{r}
+# mixed ANOVA using aov: with 'block' as within-IV, 'Cat','Month','Time' as between-IV, accuracy is DV
+anova1<-aov(accuracy~block*Cat*Month*Time+
+            Error(Ss/block)+(Cat*Month*Time),
+            data=data_long)
+summary(anova1)
+```
+
+###Using ezANOVA. Returns 1 or more cell with missing data error.
+```{r}
+# ezANOVA returns error
+# anova2<-ezANOVA(data= data_long,
+#                 dv= .(accuracy),
+#                 wid= .(Ss),
+#                 within= .(block),
+#                 between= .(Month, Time, Cat),
+#                 type= 3, detailed= TRUE)
+```
+
+###Using lme4. Still need more work on this.
+```{r message=FALSE, warning=FALSE}
+# 'block', 'Cat', 'Month', 'Time' are fixed effects
+# 'Ss' is random effects
+fullmodel_lmer <- lmer(accuracy ~ block + Cat + Month + Time +
+                       (1|Ss), data_long, REML=FALSE)
+
+# Check how to interpret summary output
+summary(fullmodel_lmer)
+```
+
+
+
+
+
+
+
+
+
+
+
