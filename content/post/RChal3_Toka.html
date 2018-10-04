@@ -72,12 +72,15 @@ data&lt;-rename(data,
 
 # It&#39;s important to convert Subject into factor
 # So R doesn&#39;t treat the entries as numerics
+
 data$Ss &lt;- factor(data$Ss)
 
 # Drop May data due to incomplete comparison groups
+
 data &lt;- subset(data, Mon != &quot;05_May&quot;)
 
 # View head of data
+
 kable(head(data))</code></pre>
 <table>
 <thead>
@@ -174,10 +177,12 @@ kable(head(data))</code></pre>
 <h3>Changing Data from Wide to Long Form</h3>
 <p>Here we want to create a new data frame that takes the column with performance in each block (AZ-BC) and puts them into a single column called ‘accuracy’ and the a new column called “block” with 1,2,3,4 as values. This new frame will be four times taller, but does not need to include every variables, only the ones you need.</p>
 <pre class="r"><code># Transform data from wide to long form using &#39;tidyr&#39; package
+
 data_long &lt;- gather(data, block, accuracy, &#39;1&#39;:&#39;4&#39;, 
                     factor_key=TRUE)
 
 # Make sure block is a factor
+
 data_long$block=factor(data_long$block)
 kable(head(data_long))</code></pre>
 <table>
@@ -265,6 +270,7 @@ kable(head(data_long))</code></pre>
 <p>Generate a line plot with errorbars (or points) that show ‘accuracy’ with ‘block’ as X-Axis and different lines for Category.</p>
 <p>First, let’s create a summary table which we would base our graph on.</p>
 <pre class="r"><code># Create summary table for block performance on each category type
+
 summary_Block&lt;-summarySE(data_long,                               
                          measurevar=&#39;accuracy&#39;,
                          groupvars=c(&#39;Cat&#39;,&#39;block&#39;))
@@ -358,15 +364,18 @@ kable(summary_Block)</code></pre>
 </tbody>
 </table>
 <pre class="r"><code># Plot accuracy change across blocks
+
 ggplot(summary_Block, aes(block, accuracy, 
             color= Cat, group= Cat)) + 
     geom_line() +  
   
 # add errorbar
+  
     geom_errorbar(aes(ymin=accuracy-se, ymax=accuracy+se),
                 colour=&quot;black&quot;, width=.1) +
   
 # add labels and titles
+  
     labs(x= &quot;Block&quot;, y= &quot;Accuracy&quot;) +
     scale_colour_hue(name=&quot;Category Type&quot;,   
                      breaks=c(&quot;RD&quot;, &quot;II&quot;),
@@ -376,10 +385,12 @@ ggplot(summary_Block, aes(block, accuracy,
     theme(plot.title= element_text(hjust= 0.5)) +
   
 # set range of y
+  
     ylim(.5, .85) +                        
     theme_light() +
   
 # Position legend in bottom right
+  
     theme(legend.justification=c(1,0),
           legend.position=c(1,0))               </code></pre>
 <p><img src="/post/RChal3_Toka_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
@@ -388,6 +399,7 @@ ggplot(summary_Block, aes(block, accuracy,
 <h3>Plotting 4 Blocks’ Performance change across the Months</h3>
 <p>Now, we also want to display MONTH information on our Category-Accuracy figure. First, let’s create a summary table with Month information included.</p>
 <pre class="r"><code># Create summary table for plotting accuracy change across months
+
 summary_Month&lt;-summarySE(data_long,                               
                          measurevar=&#39;accuracy&#39;,
                          groupvars=c(&#39;block&#39;,&#39;Mon&#39;,&#39;Cat&#39;))
@@ -472,6 +484,7 @@ kable(head(summary_Month))</code></pre>
 <p>There’re many ways to go about creating 2D figure that shows information from 3 variables. I chose to create 2 side-by-side figures seperated by category-type, with Month as x-axis, and accuracy as y-axis, the 4 blocks’ performance are represented in different colors.</p>
 <pre class="r"><code># Plot individual block performance across the months
 # Figures are seperated by Category Type
+
 ggplot(summary_Month, aes(Mon, accuracy, 
             color= block)) +
     geom_line(aes(group = block)) +
@@ -650,7 +663,7 @@ kable(summary_data)</code></pre>
 <p>Run a mixed factor ANOVA on ‘accuracy’ with ‘block’ as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: ‘accuracy’ with ‘block’ (within) and CATEGORY, MONTH, and TIME and between.</p>
 <div id="using-aov-function" class="section level3">
 <h3>Using aov function</h3>
-<pre class="r"><code># mixed ANOVA using aov: with &#39;block&#39; as within-IV, &#39;Cat&#39;,&#39;Month&#39;,&#39;Time&#39; as between-IV, accuracy is DV
+<pre class="r"><code># mixed ANOVA using aov: with &#39;block&#39; as within-IV, &#39;Cat&#39;,&#39;Mon&#39;,&#39;Time&#39; as between-IV, accuracy is DV
 anova1&lt;-aov(accuracy~block*Cat*Mon*Time+
             Error(Ss/block)+(Cat*Mon*Time),
             data=data_long)
@@ -710,12 +723,12 @@ summary(anova1)
 #                 dv= .(accuracy),
 #                 wid= .(Ss),
 #                 within= .(block),
-#                 between= .(Month, Time, Cat),
+#                 between= .(Mon, Time, Cat),
 #                 type= 3, detailed= TRUE)</code></pre>
 </div>
 <div id="using-lme4." class="section level3">
 <h3>Using lme4.</h3>
-<pre class="r"><code># &#39;block&#39;, &#39;Cat&#39;, &#39;Month&#39;, &#39;Time&#39; are fixed effects
+<pre class="r"><code># &#39;block&#39;, &#39;Cat&#39;, &#39;Mon&#39;, &#39;Time&#39; are fixed effects
 # &#39;Ss&#39; is random effects
 fullmodel_lmer &lt;- lmer(accuracy ~ block + Cat + Mon + Time +
                        (1|Ss), data_long, REML=FALSE)

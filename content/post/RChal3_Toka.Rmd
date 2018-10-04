@@ -30,7 +30,9 @@ setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogd
 ```
 
 ##Preparation
+
 ###Install Packages
+
 ```{r message=FALSE, warning=FALSE, results='hide'}
 #install.packages('prettydoc')
 #install.packages('lme4')
@@ -39,6 +41,7 @@ setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogd
 #install.packages('afex')
 ```
 ###Load packages
+
 ```{r message=FALSE, warning=FALSE, results='hide'}
 library(prettydoc)
 library(rmarkdown)
@@ -55,11 +58,13 @@ library(lme4)
 ```
 
 ##Data Manipulation
+
 ###Subsetting and Relabelling
 
 Instead of dragging hundreds predictive variables), let's just pick a few to play with. I selected 'SubjNum', 'Cat', 'Month', 'DayofWeek', 'Time2' as predictive variables in our new dataframe, and of course, we need performance (i.e., '1_Block', '2_Block', '3_Block', '4_Block', 'Total') as our outcome variables.
 
 I renamed some columns so the header row of dataframe is not cramped up together.
+
 ```{r}
 data<-read_excel('ModifiedFullData.xlsx')
 
@@ -82,12 +87,15 @@ data<-rename(data,
 
 # It's important to convert Subject into factor
 # So R doesn't treat the entries as numerics
+
 data$Ss <- factor(data$Ss)
 
 # Drop May data due to incomplete comparison groups
+
 data <- subset(data, Mon != "05_May")
 
 # View head of data
+
 kable(head(data))
 ```
 
@@ -96,10 +104,12 @@ kable(head(data))
 Here we want to create a new data frame that takes the column with performance in each block (AZ-BC) and puts them into a single column called 'accuracy' and the a new column called “block” with 1,2,3,4 as values. This new frame will be four times taller, but does not need to include every variables, only the ones you need.
 ```{r}
 # Transform data from wide to long form using 'tidyr' package
+
 data_long <- gather(data, block, accuracy, '1':'4', 
                     factor_key=TRUE)
 
 # Make sure block is a factor
+
 data_long$block=factor(data_long$block)
 kable(head(data_long))
 ```
@@ -111,8 +121,10 @@ kable(head(data_long))
 Generate a line plot with errorbars (or points) that show 'accuracy' with 'block' as X-Axis and different lines for Category. 
 
 First, let's create a summary table which we would base our graph on.
+
 ```{r}
 # Create summary table for block performance on each category type
+
 summary_Block<-summarySE(data_long,                               
                          measurevar='accuracy',
                          groupvars=c('Cat','block'))
@@ -122,15 +134,18 @@ kable(summary_Block)
 
 ```{r}
 # Plot accuracy change across blocks
+
 ggplot(summary_Block, aes(block, accuracy, 
             color= Cat, group= Cat)) + 
     geom_line() +  
   
 # add errorbar
+  
     geom_errorbar(aes(ymin=accuracy-se, ymax=accuracy+se),
                 colour="black", width=.1) +
   
 # add labels and titles
+  
     labs(x= "Block", y= "Accuracy") +
     scale_colour_hue(name="Category Type",   
                      breaks=c("RD", "II"),
@@ -140,10 +155,12 @@ ggplot(summary_Block, aes(block, accuracy,
     theme(plot.title= element_text(hjust= 0.5)) +
   
 # set range of y
+  
     ylim(.5, .85) +                        
     theme_light() +
   
 # Position legend in bottom right
+  
     theme(legend.justification=c(1,0),
           legend.position=c(1,0))               
 ```
@@ -153,6 +170,7 @@ ggplot(summary_Block, aes(block, accuracy,
 Now, we also want to display MONTH information on our Category-Accuracy figure. First, let's create a summary table with Month information included.
 ```{r}
 # Create summary table for plotting accuracy change across months
+
 summary_Month<-summarySE(data_long,                               
                          measurevar='accuracy',
                          groupvars=c('block','Mon','Cat'))
@@ -164,6 +182,7 @@ There're many ways to go about creating 2D figure that shows information from 3 
 ```{r}
 # Plot individual block performance across the months
 # Figures are seperated by Category Type
+
 ggplot(summary_Month, aes(Mon, accuracy, 
             color= block)) +
     geom_line(aes(group = block)) +
@@ -182,9 +201,11 @@ ggplot(summary_Month, aes(Mon, accuracy,
     theme_light() 
 ```
 
+
 ####Create a summary table of data
 
 I'm creating a summary table to see N for each month because the low RD performance in November looks suspicious to me. We should never interpret a graph without knowing the sample size. Upon inspection of the summary table, we can see that only 4 Ss participated in Nov_RD condition, we now understand this low performance should not be trusted due to the tiny sample size.
+
 ```{r}
 summary_data<-summarySE(data,                               
                          measurevar='Total',
@@ -202,8 +223,9 @@ kable(summary_data)
 Run a mixed factor ANOVA on 'accuracy' with 'block' as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: 'accuracy' with 'block' (within) and CATEGORY, MONTH, and TIME and between.
 
 ###Using aov function
+
 ```{r}
-# mixed ANOVA using aov: with 'block' as within-IV, 'Cat','Month','Time' as between-IV, accuracy is DV
+# mixed ANOVA using aov: with 'block' as within-IV, 'Cat','Mon','Time' as between-IV, accuracy is DV
 anova1<-aov(accuracy~block*Cat*Mon*Time+
             Error(Ss/block)+(Cat*Mon*Time),
             data=data_long)
@@ -211,19 +233,21 @@ summary(anova1)
 ```
 
 ###Using ezANOVA. Returns 1 or more cell with missing data error.
+
 ```{r}
 # ezANOVA returns error
 # anova2<-ezANOVA(data= data_long,
 #                 dv= .(accuracy),
 #                 wid= .(Ss),
 #                 within= .(block),
-#                 between= .(Month, Time, Cat),
+#                 between= .(Mon, Time, Cat),
 #                 type= 3, detailed= TRUE)
 ```
 
 ###Using lme4.
+
 ```{r message=FALSE, warning=FALSE}
-# 'block', 'Cat', 'Month', 'Time' are fixed effects
+# 'block', 'Cat', 'Mon', 'Time' are fixed effects
 # 'Ss' is random effects
 fullmodel_lmer <- lmer(accuracy ~ block + Cat + Mon + Time +
                        (1|Ss), data_long, REML=FALSE)
