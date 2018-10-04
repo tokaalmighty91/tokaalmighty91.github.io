@@ -2,7 +2,7 @@
 title: "Converting from wide to long format & ANOVA in R"
 subtitle: "Lab Code Challenge 3"
 author: "Toka"
-date: 2018-09-25T21:13:14-05:00
+date: 2018-09-25
 categories: ["R"]
 tags: ["R Markdown", "plot", "lab code challenge"]
 ---
@@ -22,7 +22,7 @@ The data in today's example was collected by our lab (led by Dr. Paul Minda) for
 
 * Generate a line plot with errorbars (or points) that show PERFORMANCE with BLOCK as X-Axis and different lines for Category. Decide on the best way to also show MONTH (same plot different line, or separate plots)
 
-* Run a mixed factor ANOVA on PERFORMANCE with BLOCK as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: PERFORMANCE with BLOCK (within) and CATEGORY, MONTH, and TIME and between.
+* Run a mixed factor ANOVA on 'accuracy' with 'block' as within and CATEGORY and MONTH and between. You can do the same for CATEGORY and TIME, and even try the full model: 'accuracy' with 'block' (within) and CATEGORY, MONTH, and TIME and between.
 
 ```{r echo=FALSE}
 setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
