@@ -6,20 +6,10 @@
     <description>Recent content in Plot on CogSci to DatSci</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 25 Sep 2018 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate>
     
 	<atom:link href="https://tokaalmighty91.github.io/tags/plot/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Converting from wide to long format &amp; ANOVA in R</title>
-      <link>https://tokaalmighty91.github.io/post/rchal3_toka/</link>
-      <pubDate>Tue, 25 Sep 2018 21:13:14 -0500</pubDate>
-      
-      <guid>https://tokaalmighty91.github.io/post/rchal3_toka/</guid>
-      <description>Introduction In this post, I will discuss about how to convert data from wide format to long format; how to create a 2D figure with information from 3 variables; and how to conduct ANOVA in 3 different ways.
-The data in today’s example was collected by our lab (led by Dr. Paul Minda) for the purpose of predicting category-learning on two types of categories (i.e.,RD: Rule-defined, and II: Information Integration). Columns from B to AY are all predictive variables.</description>
-    </item>
     
     <item>
       <title>Hello R Markdown</title>
