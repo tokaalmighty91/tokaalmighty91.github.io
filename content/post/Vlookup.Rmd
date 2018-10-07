@@ -15,14 +15,14 @@ setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogd
 ```
 
 ##Introduction
- <span style="line-height: 1.1;">
-As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices. 
+<span style="line-height: 1.5;">
+As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices. </span>
 
-##The slow way you want to avoid
+##The way you want to avoid
 Hours after delivering scantrons to the scanning services, they will send me an email containg an .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names). Then my task is to input students' grades on to OWL (i.e., Western University's teaching portal). The order of students' names is alphabetical on OWL, but the order of the grades in the .dat file is random. Along with unknown number of students that are enrolled in the course, whose names appear on OWL but not among the grades, make the manual matching of grades based on student number labourous. The slow and painful approach to inputing grades here would be to manually search through the .dat file for each student number that appeared on OWL. This quickly become daunting when there are close to 200 students in the class, and this procedure if highly prone to errors.
 
-##The way you want to adopt
-To automate the matching process, we just need one simple function in Excel, called VLOOKUP. This is one of the most useful reference functions, it is used to find related values (i.e., usually value from another column in the same row) based on a reference column value. In our case, the reference value would be 'student number'and the related value we wish the formula to return is the 'grade' of this 'student number'. </span>
+##The way you'd LOVE
+To automate the matching process, we just need one simple function in Excel, called VLOOKUP. This is one of the most useful reference functions, it is used to find related values (i.e., usually value from another column in the same row) based on a reference column value. In our case, the reference value would be 'student number'and the related value we wish the formula to return is the 'grade' of this 'student number'. 
 
 There are 8 simple steps to follow from receiving the .dat file to uploading the grades online.
 
@@ -41,7 +41,9 @@ There are 8 simple steps to follow from receiving the .dat file to uploading the
 * This is under the assumption of the gradebook files I am familiar with, where column A being students' uwo email, column B being students' full name. Column C is their student number, which is the connection we have with our SCANEXAM file. 
 
 * <b>'C2'</b> is the first student's student number. 
+
 * <b>'Sheet1!$A\$1:\$B\$200'</b> is the full range of information on the Sheet1 we just created. 
+
 * <b>'2'</b> tells excel which column of value should be returned with the range.
 * <b>'0'</b> means exact match of the reference value
 
