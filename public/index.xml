@@ -179,5 +179,15 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
       <description>Introduction In this post I will be using the 20-item CESD questionnaire as an example to conduct an exploratory factor analysis. The 20 items are shown in the figure below. Item 4, 8, 12, 16 are reverse-coded. Preparation Install Packages #install.packages(&amp;quot;Hmisc&amp;quot;) #install.packages(&amp;#39;corrplot&amp;#39;) #install.packages(&amp;#39;psych&amp;#39;) #install.packages(&amp;#39;nFactors&amp;#39;) #install.packages(&amp;#39;GPArotation&amp;#39;) #install.packages(&amp;#39;sem&amp;#39;)  Load libraries library(knitr) library(Hmisc) library(corrplot) library(psych) library(GPArotation) library(rmarkdown) library(sem)   Data Manipulation Subsetting data&amp;lt;-read.csv(&amp;#39;CESD.csv&amp;#39;) # exclude variables cesdx4,cesdx8,cesdx12, cesdx16 myvars &amp;lt;- names(data) %in% c(&amp;quot;cesdx4&amp;quot;, &amp;quot;cesdx8&amp;quot;, &amp;quot;cesdx12&amp;quot;, &amp;quot;cesdx16&amp;quot;,&amp;quot;gender&amp;quot;) data &amp;lt;- data[!</description>
     </item>
     
+    <item>
+      <title>Using VLookup to match grades for M/C exams</title>
+      <link>https://tokaalmighty91.github.io/post/vlookup/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://tokaalmighty91.github.io/post/vlookup/</guid>
+      <description>Introduction As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices.
+ The slow way Hours after delivering scantrons to the scanning services, they will send me an email containg an .</description>
+    </item>
+    
   </channel>
 </rss>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>Using VLookup to match grades for M/C exams</title>
+<meta name="description" content="Describe your website">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="all,follow">
+<meta name="googlebot" content="index,follow,snippet,archive">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/bootstrap.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,300,700,400italic">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/font-awesome.min.css">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/owl.carousel.css">
+<link rel="stylesheet" href="https://tokaalmighty91.github.io/css/owl.theme.css">
+
+
+  <link href="https://tokaalmighty91.github.io/css/style.default.css" rel="stylesheet" id="theme-stylesheet">
+
+ 
+
+  
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  
+
+
+<link href="https://tokaalmighty91.github.io/css/custom.css" rel="stylesheet">
+<link rel="shortcut icon" href="https://tokaalmighty91.github.io/img/favicon.png">
+
+
+</head>
+<body>
+  <div id="all">
+      <div class="container-fluid">
+          <div class="row row-offcanvas row-offcanvas-left">
+              <div id="sidebar" class="col-xs-6 col-sm-4 col-md-3 sidebar-offcanvas">
+  <div class="sidebar-content">
+    <h1 class="sidebar-heading"><a href="https://tokaalmighty91.github.io/">CogSci to DatSci</a></h1>
+    
+      <p class="sidebar-p">I am a PhD student in Cognitive Science with a passion for Data Science.</p>
+    
+      <p class="sidebar-p">Based in London, Canada</p>
+    
+    <ul class="sidebar-menu">
+      
+      
+        <li><a href="https://tokaalmighty91.github.io/portfolio/">Home</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/about/">About</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/post/">Post</a></li>
+      
+        <li><a href="https://tokaalmighty91.github.io/contact/">Get in touch</a></li>
+      
+    </ul>
+    <p class="social">
+  
+  
+  
+  <a href="full%20profile%20url%20in%20twitter" data-animate-hover="pulse" class="external twitter">
+    <i class="fa fa-twitter"></i>
+  </a>
+  
+  
+  
+  <a href="mailto:email@example.com" data-animate-hover="pulse" class="email">
+    <i class="fa fa-envelope"></i>
+  </a>
+  
+  
+  <a href="full%20profile%20url%20in%20linkedin" data-animate-hover="pulse" class="external">
+    <i class="fa fa-linkedin"></i>
+  </a>
+  
+  
+  
+  <a href="full%20profile%20url%20in%20github" data-animate-hover="pulse" class="external">
+    <i class="fa fa-github"></i>
+  </a>
+  
+  
+</p>
+
+
+    <div class="copyright">
+      <p class="credit">
+        
+          &copy;2018 Brain and Mind Institute
+        
+        | Template by <a href="https://bootstrapious.com/free-templates" class="external">Bootstrapious.com</a>
+
+&amp; ported to Hugo by <a href="https://github.com/kishaningithub">Kishan B</a>
+
+      </p>
+    </div>
+  </div>
+</div>
+
+              
+<div class="col-xs-12 col-sm-8 col-md-9 content-column white-background">
+  <div class="small-navbar visible-xs">
+  <button type="button" data-toggle="offcanvas" class="btn btn-ghost pull-left"> <i class="fa fa-align-left"> </i>Menu</button>
+  <h1 class="small-navbar-heading"><a href="https://tokaalmighty91.github.io/">CogSci to DatSci</a></h1>
+</div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="content-column-content">
+         <h1>Using VLookup to match grades for M/C exams</h1>
+         <div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices.</p>
+</div>
+<div id="the-slow-way" class="section level2">
+<h2>The slow way</h2>
+<p>Hours after delivering scantrons to the scanning services, they will send me an email containg an .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names). Then my task is to input students’ grades on to OWL (i.e., Western University’s teaching portal). The order of students’ names is alphabetical on OWL, but the order of the grades in the .dat file is random. Along with unknown number of students that are enrolled in the course, whose names appear on OWL but not among the grades, make the manual matching of grades based on student number labourous. The slow and painful approach to inputing grades here would be to manually search through the .dat file for each student number that appeared on OWL. This quickly become daunting when there are close to 200 students in the class, and this procedure if highly prone to errors.</p>
+</div>
+<div id="the-efficient-way" class="section level2">
+<h2>The Efficient way</h2>
+<p>To automate the matching process, we just need one simple function in Excel, called VLOOKUP. This is one of the most useful reference functions, it is used to find related values (i.e., usually value from another column in the same row) based on a reference column value. In our case, the reference value would be ‘student number’and the related value we wish the formula to return is the ’grade’ of this ‘student number’.</p>
+<p>There are 4 simple steps to follow from receiving the .dat file to uploading the grades online.</p>
+<ol style="list-style-type: decimal">
+<li><p>Open the .dat file in SCANEXAM and export in it to a readable format (I recommend .csv). Then open that file with your preferred IDE.</p></li>
+<li><p>Log on to OWL and click on ‘Gradebook’ on the left sidebar, then click on tab ‘Import/Export’, then ‘Export Gradebook’. The exported file is in .csv, usually have a name similar to this ‘gradebook_export-a74083a7-93d8-4707-8eb4-753db83e829a’.</p></li>
+<li><p>Now copy and paste the entire content of the file from SCANEXAM to a new sheet in the same workbook as the gradebook file, and name it ‘Sheet1’. <insert screenshot></p></li>
+<li><p>The gradebook sheet would list the exams that have occurred and will occur for the course, select the first empty cell in the column of that exam you want to put the grades in.</p></li>
+<li><p>Enter the formula below and click enter</p></li>
+</ol>
+<p><b>=VLOOKUP(C2,Sheet1!$A<span class="math inline">\(1:\)</span>B$200,2,0) </b></p>
+<p>This is under the assumption of the gradebook files I am familiar with, where column A being students’ uwo email, column B being students’ full name. Column C is their student number, which is the connection we have with our SCANEXAM file.</p>
+<p><b>‘C2’</b> is the first student’s student number, <b>‘Sheet1!$A<span class="math inline">\(1:\)</span>B$200’</b> is the full range of information on the Sheet1 we just created, <b>‘2’</b> tells excel which column of value should be returned with the range, <b>‘0’</b> means exact match of the reference value</p>
+<ol start="6" style="list-style-type: decimal">
+<li><p>Click on the little green triangle at the bottom right corner of the cell you are working on. The entire column of values should be generated based on the same formula.</p></li>
+<li><p>Randomly pick a few grades to compare across the two sheets to make sure no mistake was made.</p></li>
+<li><p>Once you made sure the grades are correctly matched, save the gradebook file. Since it is a csv file, Sheet1 will not be saved if you close the file. But this is what we want, because OWL only takes .csv file in the exact format as you exported it. So, go to OWL-Gradebook-Import/Export again, under the ‘Import’ section, upload your ‘gradebook_export-a74083a7-93d8-4707-8eb4-753db83e829a’ file. Note, you would have a file with a slightly different name.</p></li>
+</ol>
+</div>
+
+         
+      </div>
+    </div>
+  </div>
+</div>
+
+          </div>
+      </div>
+  </div>
+  <script src="https://tokaalmighty91.github.io/js/jquery.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/bootstrap.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/jquery.cookie.js"> </script>
+<script src="https://tokaalmighty91.github.io/js/ekko-lightbox.js"></script>
+<script src="https://tokaalmighty91.github.io/js/jquery.scrollTo.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/masonry.pkgd.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/imagesloaded.pkgd.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/owl.carousel.min.js"></script>
+<script src="https://tokaalmighty91.github.io/js/front.js"></script>
+
+</body>
+</html>
