@@ -14,12 +14,12 @@ setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogd
 
 ```
 
+
 ##Introduction
-<span style="line-height: 1.5;">
-As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices. </span>
+As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is often assigned to us is posting grades for courses whose exam format is Multiple Choices. </span>
 
 ##The way you want to avoid
-Hours after delivering scantrons to the scanning services, they will send me an email containg an .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names). Then my task is to input students' grades on to OWL (i.e., Western University's teaching portal). The order of students' names is alphabetical on OWL, but the order of the grades in the .dat file is random. Along with unknown number of students that are enrolled in the course, whose names appear on OWL but not among the grades, make the manual matching of grades based on student number labourous. The slow and painful approach to inputing grades here would be to manually search through the .dat file for each student number that appeared on OWL. This quickly become daunting when there are close to 200 students in the class, and this procedure if highly prone to errors.
+We would start with a .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names). Our task is to input students' grades on to OWL (i.e., Western University's teaching portal). The order of students' names is alphabetical on OWL, but the order of the grades in the .dat file is random. Along with unknown number of students that are enrolled in the course, whose names appear on OWL but not among the grades, make the manual matching of grades based on student number labourous. The slow and painful approach to inputing grades here would be to manually search through the .dat file for each student number that appeared on OWL. This quickly become daunting when there are close to 200 students in the class, and this procedure if highly prone to errors.
 
 ##The way you'd LOVE
 To automate the matching process, we just need one simple function in Excel, called VLOOKUP. This is one of the most useful reference functions, it is used to find related values (i.e., usually value from another column in the same row) based on a reference column value. In our case, the reference value would be 'student number'and the related value we wish the formula to return is the 'grade' of this 'student number'. 
@@ -53,7 +53,7 @@ There are 8 simple steps to follow from receiving the .dat file to uploading the
 
 8. Once you made sure the grades are correctly matched, save the gradebook file. Since it is a csv file, Sheet1 will not be saved if you close the file. But this is what we want, because OWL only takes .csv file in the exact format as you exported it. So, go to OWL-Gradebook-Import/Export again, under the 'Import' section, upload your 'gradebook_export-a74083a7-93d8-4707-8eb4-753db83e829a' file. Note, you would have a file with a slightly different name.
 
-
+I hope you find this tutorial helpful! 
 
 
 
