@@ -44,7 +44,7 @@ There are 8 simple steps to follow from receiving the .dat file to uploading the
 
 * <b>'Sheet1!$A\$1:\$B\$200'</b> is the full range of information on the Sheet1 we just created. 
 
-* <b>'2'</b> tells excel which column of value should be returned with the range.
+* <b>'2'</b> tells excel which column of value should be returned within the range.
 * <b>'0'</b> means exact match of the reference value
 
 6. Click on the little green triangle at the bottom right corner of the cell you are working on. The entire column of values should be generated based on the same formula. 
