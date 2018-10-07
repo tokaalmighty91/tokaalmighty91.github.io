@@ -66,8 +66,8 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>https://tokaalmighty91.github.io/post/vlookup/</guid>
-      <description>Introduction As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices. 
- The way you want to avoid Hours after delivering scantrons to the scanning services, they will send me an email containg an .</description>
+      <description>Introduction As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is often assigned to us is posting grades for courses whose exam format is Multiple Choices. 
+ The way you want to avoid We would start with a .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names).</description>
     </item>
     
   </channel>
