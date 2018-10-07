@@ -171,7 +171,7 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
     </item>
     
     <item>
-      <title>Using VLookup to match grades for M/C exams</title>
+      <title>Using VLookup to match Scantron grades with Gradebook list</title>
       <link>https://tokaalmighty91.github.io/post/vlookup/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
