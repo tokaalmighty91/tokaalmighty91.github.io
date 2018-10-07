@@ -12,24 +12,29 @@ draft: false
 <h2>Introduction</h2>
 <p>As graduate Teaching Assitants, we are often assigned mundane tasks which require little to no intelletual involvement, and would be rather time consuming if no automatic method was applied. One of the tasks that is assigned to me is posting grades for courses whose exam format is Multiple Choices.</p>
 </div>
-<div id="the-slow-way" class="section level2">
-<h2>The slow way</h2>
+<div id="the-slow-way-you-want-to-avoid" class="section level2">
+<h2>The slow way you want to avoid</h2>
 <p>Hours after delivering scantrons to the scanning services, they will send me an email containg an .dat file containing the grades of the students that have taken part in the exam, along with their student numbers (but not their names). Then my task is to input students’ grades on to OWL (i.e., Western University’s teaching portal). The order of students’ names is alphabetical on OWL, but the order of the grades in the .dat file is random. Along with unknown number of students that are enrolled in the course, whose names appear on OWL but not among the grades, make the manual matching of grades based on student number labourous. The slow and painful approach to inputing grades here would be to manually search through the .dat file for each student number that appeared on OWL. This quickly become daunting when there are close to 200 students in the class, and this procedure if highly prone to errors.</p>
 </div>
-<div id="the-efficient-way" class="section level2">
-<h2>The Efficient way</h2>
+<div id="the-way-you-want-to-adopt" class="section level2">
+<h2>The way you want to adopt</h2>
 <p>To automate the matching process, we just need one simple function in Excel, called VLOOKUP. This is one of the most useful reference functions, it is used to find related values (i.e., usually value from another column in the same row) based on a reference column value. In our case, the reference value would be ‘student number’and the related value we wish the formula to return is the ’grade’ of this ‘student number’.</p>
-<p>There are 4 simple steps to follow from receiving the .dat file to uploading the grades online.</p>
+<p>There are 8 simple steps to follow from receiving the .dat file to uploading the grades online.</p>
 <ol style="list-style-type: decimal">
 <li><p>Open the .dat file in SCANEXAM and export in it to a readable format (I recommend .csv). Then open that file with your preferred IDE.</p></li>
 <li><p>Log on to OWL and click on ‘Gradebook’ on the left sidebar, then click on tab ‘Import/Export’, then ‘Export Gradebook’. The exported file is in .csv, usually have a name similar to this ‘gradebook_export-a74083a7-93d8-4707-8eb4-753db83e829a’.</p></li>
-<li><p>Now copy and paste the entire content of the file from SCANEXAM to a new sheet in the same workbook as the gradebook file, and name it ‘Sheet1’. <insert screenshot></p></li>
+<li><p>Now copy and paste the entire content of the file from SCANEXAM to a new sheet in the same workbook as the gradebook file, and name it ‘Sheet1’. <img src="/post/Vlookup_files/2sheet.png" style="width:80.0%" /></p></li>
 <li><p>The gradebook sheet would list the exams that have occurred and will occur for the course, select the first empty cell in the column of that exam you want to put the grades in.</p></li>
 <li><p>Enter the formula below and click enter</p></li>
 </ol>
-<p><b>=VLOOKUP(C2,Sheet1!$A<span class="math inline">\(1:\)</span>B$200,2,0) </b></p>
-<p>This is under the assumption of the gradebook files I am familiar with, where column A being students’ uwo email, column B being students’ full name. Column C is their student number, which is the connection we have with our SCANEXAM file.</p>
-<p><b>‘C2’</b> is the first student’s student number, <b>‘Sheet1!$A<span class="math inline">\(1:\)</span>B$200’</b> is the full range of information on the Sheet1 we just created, <b>‘2’</b> tells excel which column of value should be returned with the range, <b>‘0’</b> means exact match of the reference value</p>
+<ul>
+<li><p><b>=VLOOKUP(C2,Sheet1!$A<span class="math inline">\(1:\)</span>B$200,2,0) </b></p></li>
+<li><p>This is under the assumption of the gradebook files I am familiar with, where column A being students’ uwo email, column B being students’ full name. Column C is their student number, which is the connection we have with our SCANEXAM file.</p></li>
+<li><b>‘C2’</b> is the first student’s student number,</li>
+<li><b>‘Sheet1!$A<span class="math inline">\(1:\)</span>B$200’</b> is the full range of information on the Sheet1 we just created,</li>
+<li><b>‘2’</b> tells excel which column of value should be returned with the range,</li>
+<li><p><b>‘0’</b> means exact match of the reference value</p></li>
+</ul>
 <ol start="6" style="list-style-type: decimal">
 <li><p>Click on the little green triangle at the bottom right corner of the cell you are working on. The entire column of values should be generated based on the same formula.</p></li>
 <li><p>Randomly pick a few grades to compare across the two sheets to make sure no mistake was made.</p></li>
