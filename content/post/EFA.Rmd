@@ -15,7 +15,6 @@ In this post I will be using the 20-item CESD questionnaire as an example to con
 
 ```{r echo = FALSE}
 setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogdown/tokaalmighty91.github.io/content/post')
-
 ```
 
 ##Preparation
@@ -27,6 +26,8 @@ setwd('/Users/tzhu9/Documents/OneDrive - The University of Western Ontario/Blogd
 #install.packages('nFactors')
 #install.packages('GPArotation')
 #install.packages('sem')
+#install.packages("magrittr")
+#install.packages('kableExtra')
 ```
 ###Load libraries
 ```{r message=FALSE, warning=FALSE, results='hide'}
@@ -37,6 +38,8 @@ library(psych)
 library(GPArotation)
 library(rmarkdown)
 library(sem)
+library(magrittr)
+library(kableExtra)
 ```
 
 ##Data Manipulation
@@ -57,7 +60,8 @@ nrow(data)
 ```
 ```{r}
 # View first 6 lines of data
-kable(head(data))
+
+kable(head(data), "html")
 ```
 
 ```{r}
@@ -70,7 +74,7 @@ length(which(rowMeans(is.na(data)) > 0.5))
 data<- data[-which(rowMeans(is.na(data)) > 0.5) , ] 
 
 # view first 6 rows of cleaned data
-kable(head(data))
+kable(head(data), "html")
 ```
 
 ```{r}
@@ -88,7 +92,8 @@ nrow(data)
 
 cor_matrix1<- cor(data, method = "pearson", 
                   use = "pairwise.complete.obs")
-kable(round(cor_matrix1, 2))
+
+kable(round(cor_matrix1, 2), "html") 
 ```
 
 ###cor_matrix2, with significance levels
@@ -117,7 +122,7 @@ pretty_cormatrix2<-flattenCorMatrix2(cor_matrix2$r, cor_matrix2$P)
 
 # All p's are highly significant (roughly 0)
 # So I only display the first 6 row of pretty_cormatrix2
-kable(head(pretty_cormatrix2))
+kable(head(pretty_cormatrix2), "html")
 ```
 
 ##Factor Extraction and Selection- Using psych package
