@@ -238,7 +238,7 @@ ezDesign(data_long,y=Mon, x= Time, col=Cat)
 ```
 For month November, we did not have entries for Cat II for one time slot, and did not have entries for Cat RD for 2 time slots
 
-```{r}
+```{r warning=FALSE}
 anova2<-ezANOVA(data= subset(data_long, Mon!= '11_Nov'),
                  dv= .(accuracy),
                  wid= .(Ss),
