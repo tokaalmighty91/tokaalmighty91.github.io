@@ -716,15 +716,97 @@ summary(anova1)
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 </div>
-<div id="using-ezanova.-returns-1-or-more-cell-with-missing-data-error." class="section level3">
-<h3>Using ezANOVA. Returns 1 or more cell with missing data error.</h3>
-<pre class="r"><code># ezANOVA returns error
-# anova2&lt;-ezANOVA(data= data_long,
-#                 dv= .(accuracy),
-#                 wid= .(Ss),
-#                 within= .(block),
-#                 between= .(Mon, Time, Cat),
-#                 type= 3, detailed= TRUE)</code></pre>
+<div id="using-ezanova." class="section level3">
+<h3>Using ezANOVA.</h3>
+<p>Check whether we have a balanced design</p>
+<pre class="r"><code>ezDesign(data_long,y=Mon, x= Time, col=Cat)</code></pre>
+<p><img src="/post/RChal3_Toka_files/figure-html/unnamed-chunk-12-1.png" width="672" /> For month November, we did not have entries for Cat II for one time slot, and did not have entries for Cat RD for 2 time slots</p>
+<pre class="r"><code>anova2&lt;-ezANOVA(data= subset(data_long, Mon!= &#39;11_Nov&#39;),
+                 dv= .(accuracy),
+                 wid= .(Ss),
+                 within= .(block),
+                 between= .(Mon, Time, Cat),
+                 type= 3, detailed= TRUE)
+## Warning: You have removed one or more Ss from the analysis. Refactoring
+## &quot;Ss&quot; for ANOVA.
+## Warning: Converting &quot;Mon&quot; to factor for ANOVA.
+## Warning: Converting &quot;Time&quot; to factor for ANOVA.
+## Warning: Converting &quot;Cat&quot; to factor for ANOVA.
+## Warning: The column supplied as the wid variable contains non-unique values
+## across levels of the supplied between-Ss variables. Automatically fixing
+## this by generating unique wid labels.
+## Warning: Data is unbalanced (unequal N per group). Make sure you specified
+## a well-considered value for the type argument to ezANOVA().
+## Warning: Collapsing data to cell means. *IF* the requested effects are a
+## subset of the full design, you must use the &quot;within_full&quot; argument, else
+## results may be inaccurate.
+anova2
+## $ANOVA
+##                Effect DFn  DFd          SSn       SSd            F
+## 1         (Intercept)   1  402 606.75157259 14.573222 1.673715e+04
+## 2                 Mon   5  402   1.08419460 14.573222 5.981467e+00
+## 3                Time   2  402   0.01636335 14.573222 2.256902e-01
+## 4                 Cat   1  402   2.95864251 14.573222 8.161368e+01
+## 9               block   3 1206   1.68771056  5.357127 1.266462e+02
+## 5            Mon:Time  10  402   0.46100906 14.573222 1.271686e+00
+## 6             Mon:Cat   5  402   0.10118061 14.573222 5.582102e-01
+## 7            Time:Cat   2  402   0.02622303 14.573222 3.616791e-01
+## 10          Mon:block  15 1206   0.10301294  5.357127 1.546023e+00
+## 11         Time:block   6 1206   0.03618003  5.357127 1.357479e+00
+## 12          Cat:block   3 1206   0.16593884  5.357127 1.245209e+01
+## 8        Mon:Time:Cat  10  402   0.49910438 14.573222 1.376771e+00
+## 13     Mon:Time:block  30 1206   0.12741360  5.357127 9.561145e-01
+## 14      Mon:Cat:block  15 1206   0.04661637  5.357127 6.996206e-01
+## 15     Time:Cat:block   6 1206   0.01335488  5.357127 5.010766e-01
+## 16 Mon:Time:Cat:block  30 1206   0.12513377  5.357127 9.390066e-01
+##               p p&lt;.05          ges
+## 1  0.000000e+00     * 0.9681970260
+## 2  2.367496e-05     * 0.0515925841
+## 3  7.980663e-01       0.0008203531
+## 4  7.014612e-18     * 0.1292605019
+## 9  2.591153e-71     * 0.0780694753
+## 5  2.442742e-01       0.0226080609
+## 6  7.320517e-01       0.0050510677
+## 7  6.967323e-01       0.0013140049
+## 10 8.217153e-02       0.0051420696
+## 11 2.286665e-01       0.0018120341
+## 12 5.060925e-08     * 0.0082571885
+## 8  1.885246e-01       0.0244306286
+## 13 5.346943e-01       0.0063523339
+## 14 7.868221e-01       0.0023335062
+## 15 8.078805e-01       0.0006696289
+## 16 5.615261e-01       0.0062393798
+## 
+## $`Mauchly&#39;s Test for Sphericity`
+##                Effect        W            p p&lt;.05
+## 9               block 0.749672 2.879029e-23     *
+## 10          Mon:block 0.749672 2.879029e-23     *
+## 11         Time:block 0.749672 2.879029e-23     *
+## 12          Cat:block 0.749672 2.879029e-23     *
+## 13     Mon:Time:block 0.749672 2.879029e-23     *
+## 14      Mon:Cat:block 0.749672 2.879029e-23     *
+## 15     Time:Cat:block 0.749672 2.879029e-23     *
+## 16 Mon:Time:Cat:block 0.749672 2.879029e-23     *
+## 
+## $`Sphericity Corrections`
+##                Effect       GGe        p[GG] p[GG]&lt;.05       HFe
+## 9               block 0.8321119 7.589516e-60         * 0.8377255
+## 10          Mon:block 0.8321119 9.857105e-02           0.8377255
+## 11         Time:block 0.8321119 2.380135e-01           0.8377255
+## 12          Cat:block 0.8321119 4.944320e-07         * 0.8377255
+## 13     Mon:Time:block 0.8321119 5.255357e-01           0.8377255
+## 14      Mon:Cat:block 0.8321119 7.589210e-01           0.8377255
+## 15     Time:Cat:block 0.8321119 7.753280e-01           0.8377255
+## 16 Mon:Time:Cat:block 0.8321119 5.500710e-01           0.8377255
+##           p[HF] p[HF]&lt;.05
+## 9  3.138404e-60         *
+## 10 9.796584e-02          
+## 11 2.377016e-01          
+## 12 4.580772e-07         *
+## 13 5.258668e-01          
+## 14 7.599417e-01          
+## 15 7.765361e-01          
+## 16 5.504829e-01</code></pre>
 </div>
 <div id="using-lme4." class="section level3">
 <h3>Using lme4.</h3>

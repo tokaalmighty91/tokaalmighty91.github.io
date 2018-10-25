@@ -53,7 +53,6 @@ library(knitr)
 library(tidyr)
 library(tidyverse)
 library(lme4)
-
 ```
 
 ##Data Manipulation
@@ -231,16 +230,22 @@ anova1<-aov(accuracy~block*Cat*Mon*Time+
 summary(anova1)
 ```
 
-###Using ezANOVA. Returns 1 or more cell with missing data error.
+###Using ezANOVA. 
+
+Check whether we have a balanced design
+```{r}
+ezDesign(data_long,y=Mon, x= Time, col=Cat)
+```
+For month November, we did not have entries for Cat II for one time slot, and did not have entries for Cat RD for 2 time slots
 
 ```{r}
-# ezANOVA returns error
-# anova2<-ezANOVA(data= data_long,
-#                 dv= .(accuracy),
-#                 wid= .(Ss),
-#                 within= .(block),
-#                 between= .(Mon, Time, Cat),
-#                 type= 3, detailed= TRUE)
+anova2<-ezANOVA(data= subset(data_long, Mon!= '11_Nov'),
+                 dv= .(accuracy),
+                 wid= .(Ss),
+                 within= .(block),
+                 between= .(Mon, Time, Cat),
+                 type= 3, detailed= TRUE)
+anova2
 ```
 
 ###Using lme4.
