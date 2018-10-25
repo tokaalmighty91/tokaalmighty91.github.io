@@ -827,19 +827,6 @@ summary(anova1)
                  within= .(block),
                  between= .(Mon, Time, Cat),
                  type= 3, detailed= TRUE)
-## Warning: You have removed one or more Ss from the analysis. Refactoring
-## &quot;Ss&quot; for ANOVA.
-## Warning: Converting &quot;Mon&quot; to factor for ANOVA.
-## Warning: Converting &quot;Time&quot; to factor for ANOVA.
-## Warning: Converting &quot;Cat&quot; to factor for ANOVA.
-## Warning: The column supplied as the wid variable contains non-unique values
-## across levels of the supplied between-Ss variables. Automatically fixing
-## this by generating unique wid labels.
-## Warning: Data is unbalanced (unequal N per group). Make sure you specified
-## a well-considered value for the type argument to ezANOVA().
-## Warning: Collapsing data to cell means. *IF* the requested effects are a
-## subset of the full design, you must use the &quot;within_full&quot; argument, else
-## results may be inaccurate.
 anova2
 ## $ANOVA
 ##                Effect DFn  DFd          SSn       SSd            F
