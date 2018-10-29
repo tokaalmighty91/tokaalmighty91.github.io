@@ -1,0 +1,231 @@
+---
+title: "CFA Model Modification in R lavaan"
+author: "Toka"
+date: "Oct 29, 2018"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  pdf_document:
+    highlight: tango
+    latex_engine: xelatex
+    toc: yes
+    toc_depth: 3
+geometry: margin= 1in
+sansfont: Calibri Light
+fontsize: 12pt
+---
+
+#Introduction
+
+Confirmatory factor analysis (CFA) is the type of model that extracts common underlying variables from several observed variables and specifying the relationship between the observed and unobserved variables. In this post, I will run a CFA in R using the lavaan package, interpret the output, and make model modifications based on the results. 
+
+#Running a CFA in R
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(lavaan)
+library(semPlot)
+library(data.table)
+```
+
+I will use the Motivations for Alcohol Use Among Adolescents Questionnaire (Cooper, 1994) which consists of four subscales assessing motives for alcohol consumption: Social, Coping, Enhancement, and Conformity. The data are from a large sampel of 848 first year university students that Dr.Paul Tremblay collected years back.First, let's read in the data. Missing data was coded as '-99'.
+
+There are 20 items, and you can find the full item names at the end of this post.
+
+Item format: Likert 
+(1) never or almost never; 
+(2) some of the time; 
+(3) half of the time; 
+(4) most of the
+time; 
+(5) always or almost always
+
+The four latent variables are created as such:
+MODEL:
+social by rC rE rK rN rP;
+coping by rA rD rF rO rQ;
+enhanc by rG rI rJ rM rR;
+conform by rB rH rL rS rT;
+
+```{r}
+data<-read.csv('reasons.csv', na.strings = '-99')
+```
+
+Let's look at the first 6 rows of the data. The 20 items were labelled as reasona through reasont.
+
+```{r}
+head(data)
+```
+
+##Specifying a CFA model
+
+Let's check the number of rows in the data.
+
+```{r}
+length(data)
+```
+
+Now let's check the number of complete rows to get an idea of how many subject we will need to remove from analysis.
+
+```{r}
+sum(complete.cases(data))
+```
+
+I used listwise deletion and removed all subjects that had missing data in any of their 20-item response.
+
+```{r}
+#listwise deletion of missing data
+data<-na.omit(data)
+head(data)
+```
+
+We may want to rename the columns so the structure figure of the model at the end would not look too cramped. The 'reason' part of the column names are removed. 
+
+```{r}
+setnames(data, old=c('reasonc', 'reasone', 'reasonk', 'reasonn' ,'reasonp',
+'reasona','reasond','reasonf','reasono','reasonq',
+'reasong','reasoni','reasonj','reasonm','reasonr',
+'reasonb','reasonh','reasonl','reasons','reasont'), new=c('c','e','k','n','p','a','d','f','o','q','g','i','j','m','r','b','h','l','s','t'))
+```
+
+Let's take a look at the first 6 rows again.
+
+```{r}
+head(data)
+```
+
+To build a CFA model in lavaan, you’ll save a string with the model details. Each line is one latent factor, with its indicators following the =~ (read this symbol as “is measured by”).
+
+In the code above, there are four latent factors referring to students’ mental ability: social, coping, enhancement, and conformity. The latent factors themselves are never directly measured (that’s what it means for them to be latent), but we’re assuming the 20 variables we did observe are indicators of those latent factors: The social latent factor is measured by c,e,k,n,p. The coping latent factor is measured by a,d,f,o,q. The enhancement factor is measured by g,i,j,m,r. The conformity factor is measured by b,h,l,s,t.
+
+```{r}
+cfamodel<-'
+social=~c+e+k+n+p
+coping=~a+d+f+o+q
+enhanc=~g+i+j+m+r
+conform=~b+h+l+s+t
+'
+```
+
+
+The default estimator for CFA models with continuous indicators is maximum likelihood (ML).
+Latent factors aren’t measured, so they don’t naturally have any scale. In order to come up with a unique solution, though, the estimator needs to have some scale for them. One solution is to set each latent factor’s scale to the scale of its first indicator — this is lavaan’s default behavior. Another option is to constrain the latent factors to have a mean of 0 and a variance of 1 (i.e. to standardize them). Both approaches will give you equivalent results, without specifying 'std.lv=TRUE' when you call cfa(), you will get results from both options. 
+
+In the Latent Variables section of the fit summary output, 'Estimates' is the loading estimates when the first indicator of each factor was set as marker indicator. 'Std.lv' is the loading estimates when the latent factor variances were constrainted to be 1. 
+
+```{r}
+fit<-cfa(cfamodel, data)
+summary(fit, fit.measures=TRUE, standardized=T, rsquare=T)
+```
+
+##Check fit indices
+
+<b>CFI (Comparative fit index)</b>: Measures whether the model fits the data better than a more restricted baseline model. Higher is better, with okay fit > .9.
+
+<b>TLI (Tucker-Lewis index)</b>: Similar to CFI, but it penalizes overly complex models (making it more conservative than CFI). Measures whether the model fits the data better than a more restricted baseline model. Higher is better, with okay fit > .9.
+
+<b>RMSEA (Root mean square error of approximation)</b>: The “error of approximation” refers to residuals. Instead of comparing to a baseline model, it measures how closely the model reproduces data patterns (i.e. the covariances among indicators). Lower is better. It comes with a 90%CI in lavaan and other major SEM software, so that’s often reported along with it.
+
+The p-value printed with it tests the hypothesis that RMSEA is less than or equal to .06 (a cutoff sometimes used for “close” fit); here, our RMSEA is greater than .05 (it’s .092, with a 90%CI from .07 to .11), so the p-value is unsurprisingly significant, telling us that RMSEA is NOT less than or equal to .05. This p-value is sometimes called “the p of Close Fit” or “PCLOSE” in other software. If it is greater than α (usually set at .05), then it is typical to report that the model has “close fit” according to the RMSEA.
+
+Also note that Good model fit does not make a good model. The model needs to be solid theoretically before you estimate it. 
+
+##residual correlations
+
+The goal of the CFA is to explain relationships among the observed variables by specifying a latent structure connecting them.
+
+For example, in our model, we’re saying that c,e,k,n, and p are all correlated because they’re different ways to measure the same basic underlying motivation, social. And although c and b measure different motivations (social andd conformity, respectively), we would still expect them to have some correlation because individuals latent social and conformity motivations are correlated.
+
+Because our model implies expected relationships among the observed variables, one way to examine its performance is to look at the difference between the correlation matrix the model expects and the actual, observed correlation matrix you get from your raw data. These (or the equivalent based on covariance matrices) are the residuals of an SEM model. Any large residual correlations between variables suggests that there’s something about the relationship between those two indicators that the model is not adequately capturing.
+
+
+```{r}
+correl<- residuals(fit, type='cor')
+correl
+```
+
+Keep an eye out for residual correlations larger than about .1. These residuals mostly look really good, with the few exceptions, most strikingly item 'o' is highly correlated with many other items. The RMSEA discussed above is based on these residual correlations, so the deviations we’re seeing here are what’s driving the RMSEA value we saw above.
+
+Modification indices tell you how model fit would change if you added new parameters to the model. Since your CFA model should not be exploratory (i.e. you should know what parameters you want to include in the model before you begin), modification indices can be dangerous. If you make the changes they suggest, you run a serious risk of over-fitting your data and reducing the generalizability of your results.
+
+Instead, I recommend using modification indices mostly as another description of the places where your model is not fitting well, like examining the residuals. In the code below, I’ve sorted the modification indices by mi which is an estimate of how much the model fit would improve if each parameter were added. You can see from the output below that the top modification indices are all for item o, suggesting that those variables are involved in some covariances that aren’t well captured by the current model structure. In particular, the top modification index is for a factor loading from social or enhancement to o (i.e., feel more self-confident); it’s useful to know that there is some extra covariance between o and the social and enhancement motivation. Taken together, this all suggests to me that o is not quite adhering to the expected pattern from the model. 
+
+```{r}
+kable(modificationindices(fit, sort. =T, minimum.value = 30))
+```
+
+#Model modification
+
+##Modified model 1
+
+As we have seen that o was a problematic item, thus we will remove it in this model specification.
+
+```{r}
+cfamodel_2<-'
+social=~c+e+k+n+p
+coping=~a+d+f+q
+enhanc=~g+i+j+m+r
+conform=~b+h+l+s+t
+'
+
+fit2<-cfa(cfamodel_2, data)
+```
+
+```{r}
+#summary(fit2, fit.measures=TRUE, standardized=T, rsquare=T)
+fit2
+```
+
+```{r}
+kable(modificationindices(fit2, sort. =T, minimum.value = 30))
+```
+
+
+##Modified model 2
+
+Add error covariances between g and m
+```{r}
+cfamodel_3<-'
+social=~c+e+k+n+p
+coping=~a+d+f+q
+enhanc=~g+i+j+m+r
+conform=~b+h+l+s+t
+g~~m
+'
+
+fit3<-cfa(cfamodel_3, data)
+summary(fit3, fit.measures=TRUE, standardized=T, rsquare=T)
+```
+
+#Graph final model structure
+```{r}
+semPaths(fit3, 'std', layout='tree')
+```
+
+
+There are 20 items labelled rA rB rC rD rE rF rG rH rI rJ rK rL rM rN rO rP rQ rR rS rT (and this is the
+order of the variables in the data file.<br>
+Reason a - forget worries<br>
+Reason b - friends pressure<br>
+Reason c - help enjoy party<br>
+Reason d - relieve feeling depressed or nervous<br>
+Reason e - to be sociable<br>
+Reason f - to cheer up<br>
+Reason g - like the feeling<br>
+Reason h - avoid being teased<br>
+Reason i - it is exciting<br>
+Reason j - get high<br>
+Reason k - makes social gatherings more fun<br>
+Reason l - fit in with group<br>
+Reason m - gives pleasant feeling<br>
+Reason n - improves parties<br>
+Reason o - feel more self-confident<br>
+Reason p – celebrate special occasions<br>
+Reason q - forget about problems<br>
+Reason r - it is fun<br>
+Reason s - to be liked<br>
+Reason t - so will not feel left out<br>
+
+
