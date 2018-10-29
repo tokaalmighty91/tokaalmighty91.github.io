@@ -43,6 +43,16 @@ summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 2
     </item>
     
     <item>
+      <title>CFA Model Modification in R lavaan</title>
+      <link>https://tokaalmighty91.github.io/post/cfa/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://tokaalmighty91.github.io/post/cfa/</guid>
+      <description>Introduction Confirmatory factor analysis (CFA) is the type of model that extracts common underlying variables from several observed variables and specifying the relationship between the observed and unobserved variables. In this post, I will run a CFA in R using the lavaan package, interpret the output, and make model modifications based on the results.
+ Running a CFA in R library(knitr) library(lavaan) library(semPlot) library(data.table) I will use the Motivations for Alcohol Use Among Adolescents Questionnaire (Cooper, 1994) which consists of four subscales assessing motives for alcohol consumption: Social, Coping, Enhancement, and Conformity.</description>
+    </item>
+    
+    <item>
       <title>Exploratory Factor Analysis using R</title>
       <link>https://tokaalmighty91.github.io/post/efa/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
